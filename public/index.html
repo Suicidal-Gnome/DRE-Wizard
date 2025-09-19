@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>DRE Face Sheet — Full Web Form</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <style>
+    :root{
+      --bg:#f8fafc; --card:#fff; --line:#e5e7eb; --muted:#6b7280; --ink:#0a1325; --accent:#0b5ed7;
+      --radius:8px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--ink)}
+    header{background:linear-gradient(90deg,#062c56,#0b3e7a);color:#fff;padding:14px 18px}
+    header h1{margin:0;font-size:18px}
+    main{max-width:1100px;margin:16px auto;padding:0 14px}
+    .panel{background:var(--card);border-radius:10px;box-shadow:0 2px 10px rgba(10,20,40,.06);padding:14px}
+
+    .sec{margin-top:12px;border:1px solid var(--line);border-radius:10px}
+    .sec h2{margin:0;padding:10px 12px;font-size:14px;background:#f2f5fb;border-bottom:1px solid var(--line)}
+
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px}
+    .grid.two{grid-template-columns:repeat(2,1fr)}
+    .grid.one{grid-template-columns:1fr}
+    .span-2{grid-column:span 2}
+    .span-3{grid-column:span 3}
+
+    label{display:block;font-size:12px;color:var(--muted)}
+    input,textarea,select{
+      width:100%;margin-top:4px;padding:8px;border:1px solid var(--line);
+      border-radius:var(--radius);font-size:14px;background:#fff
+    }
+    textarea{min-height:80px;resize:vertical}
+
+    /* Group outline matches inputs */
+    .group{
+      border:1px solid var(--line); border-radius:var(--radius); padding:8px;
+      background:#fff; margin-top:4px
+    }
+    .group-title{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+    .inline input[type="text"]{min-width:260px}
+
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 12px;font-weight:600;cursor:pointer}
+    button.secondary{background:#e9edf6;color:#062c56}
+    #narrative{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:8px;min-height:80px}
+    small.muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+<header><h1>DRE Face Sheet — Full Web Form</h1></header>
+<main>
+  <div class="panel">
+    <form id="dreForm"></form>
+    <div class="actions">
+      <button id="previewBtn" type="button">Preview Narrative</button>
+      <button id="pdfBtn" type="button" class="secondary">Generate PDF</button>
+      <button id="saveJson" type="button" class="secondary">Download JSON</button>
+      <label class="secondary" style="padding:10px;border-radius:8px;display:inline-block">
+        <input type="file" id="loadJson" accept=".json" style="display:none"/>Load JSON
+      </label>
+      <button id="clearBtn" type="button" class="secondary">Clear</button>
+    </div>
+    <h3 style="margin:12px 0 6px">Narrative Preview</h3>
+    <div id="narrative"></div>
+    <small class="muted">PDF export hits <code>/pdf</code>. Narrative preview hits <code>/narrative</code>.</small>
+  </div>
+</main>
+
+<script>
+  // ========== Schema (with improved Case/Evaluator layout & outlined groups) ==========
+  const SCHEMA = [
+    ["Case / Evaluator","case",[
+      // Row 1
+      ["Evaluator","text","Evaluator (DRE Name)"],
+      ["DRE_Number","text","DRE #"],
+      ["Rolling_Log_Number","text","Rolling Log #"],
+      // Row 2
+      ["Case_Number","text","Case #"],
+      ["Recorder","text","Recorder / Witnesses","span-2"],
+      // Row 3
+      ["Arresting_Officer","text","Arresting Officer"],
+      ["Arresting_Agency","text","Officer’s Agency","span-2"],
+      // Row 4
+      ["Location","text","Evaluation Location","span-3"],
+      // Row 5 — groups: each spans one column (Miranda spans 2 so notes have room)
+      ["Crash_Group","crashExclusive","Crash"],
+      ["Chemical_Group","chemicalMulti","Chemical Test"],
+      ["Miranda_Group","miranda","Miranda Warning Given","span-2"],
+      // Row 6
+      ["Eval_Date","date","Date Examined"],
+      ["Eval_Time","time","Time Examined"],
+    ]],
+
+    ["Subject","subject",[
+      ["Subject_Name","text","Arrestee’s Name (Last, First, MI)","span-2"],
+      ["Subject_DOB","date","DOB"],
+      ["Subject_Age","number","Age"],
+      ["Subject_Gender","select","Sex",["Male","Female","Nonbinary/Other","Unknown"]],
+      ["Subject_Race","select","Race",[
+        "White","Black/African American","Asian",
+        "American Indian/Alaska Native","Native Hawaiian/Other Pacific Islander",
+        "Hispanic/Latino","Middle Eastern/North African","Other","Unknown"
+      ],"span-2"],
+      ["Breath_Result","text","Breath Test — Results"],
+      ["Breath_Instrument_Number","text","Breath Test — Instrument #"]
+    ]],
+
+    ["Interview","interview",[
+      ["Food_When","text","What have you eaten today? When?","span-3"],
+      ["Drinking","text","What have you been drinking? How much? Time of last drink?","span-3"],
+      ["Time_Now","text","Time now — Actual"],
+      ["Sleep","text","When did you last sleep? How long?","span-2"]
+    ]],
+
+    ["Medical / Physical","medical",[
+      ["Sick_Injured","text","Are you sick or injured?"],
+      ["Diabetic_Epileptic","text","Are you diabetic or epileptic?"],
+      ["Insulin","text","Do you take insulin?"],
+      ["Physical_Defects","text","Any physical defects?"],
+      ["Under_Doctor","text","Under the care of a doctor or dentist?"],
+      ["Medication_Drugs","text","Taking any medication or drugs?"]
+    ]],
+
+    ["Preliminary Exam","prelim",[
+      ["Attitude","text","Attitude"],
+      ["Coordination","text","Coordination"],
+      ["Speech","text","Speech"],
+      ["Breath_Odor","text","Breath Odor"],
+      ["Face","text","Face"],
+      ["Pulse1","text","First Pulse / Time"],
+      ["Corrective_Lenses","text","Corrective Lenses"],
+      ["Eyes_Blindness","text","Eyes Blindness"],
+      ["Tracking","text","Tracking"],
+      ["Pupil_Explain","text","Pupil size (explain)","span-2"],
+      ["Resting_Nyst","text","Resting Nystagmus"],
+      ["Vertical_Nyst","text","Vertical Nystagmus"],
+      ["Follow_Stimulus","text","Able to follow stimulus"],
+      ["Eyelids","text","Eyelids"],
+      ["Prelim_Notes","text","Preliminary Exam Notes","span-3"]
+    ]],
+
+    ["HGN / VGN / Convergence","hgn",[
+      ["HGN_Left","text","HGN Left Eye"],
+      ["HGN_Right","text","HGN Right Eye"],
+      ["VGN","text","VGN (present/absent)"],
+      ["HGN_LSP","text","Lack of Smooth Pursuit"],
+      ["HGN_MD","text","Maximum Deviation"],
+      ["HGN_AOO","text","Angle of Onset"],
+      ["LOC","text","Lack of Convergence","span-3"]
+    ]],
+
+    ["Psychophysical Tests","psychophys",[
+      ["Romberg","text","Modified Romberg Balance Test","span-3"],
+      ["MRomberg","text","Time Estimation (est. 30 sec)","span-3"],
+      ["WnT","text","Walk and Turn (notes/clues)","span-3"],
+      ["OLS","text","One Leg Stand (L/R, time/clues)","span-3"],
+      ["FTN","text","Finger to Nose","span-3"]
+    ]],
+
+    ["Vital Signs & Pupils","vitals",[
+      ["Pulse2","text","Second Pulse / Time"],
+      ["BP","text","Blood Pressure"],
+      ["Temp","text","Body Temperature"],
+      ["Pupil_Room","text","Pupil Size — Room light (L/R)"],
+      ["Pupil_Dark","text","Pupil Size — Darkness (L/R)"],
+      ["Pupil_Near","text","Pupil Size — Direct/Near (L/R)"],
+      ["Pupil_LightReact","text","Reaction to Light"],
+      ["Pulse3","text","Third Pulse / Time"],
+      ["UV_Used","text","UV light used (Y/N)"]
+    ]],
+
+    ["Oral / Nasal Cavity","oral",[
+      ["Oral_Cavity","text","Oral Cavity","span-3"],
+      ["Nasal_Cavity","text","Nasal Cavity","span-3"],
+      ["Rebound_Dilation","text","Rebound Dilation","span-3"]
+    ]],
+
+    ["Drug Use Details","druguse",[
+      ["Drugs_Used","text","What drugs or medications have you been using?","span-3"],
+      ["Dose","text","How much?","span-3"],
+      ["Time_of_Use","text","Time of use","span-3"],
+      ["Where_Used","text","Where were the drugs used?","span-3"],
+      ["Ingestion","text","Signs of ingestion (odor/residue/paraphernalia)","span-3"]
+    ]],
+
+    ["Timeline","timeline",[
+      ["Arrest_DateTime","text","Date and time of arrest","span-3"],
+      ["DRE_Notified","text","Time DRE notified","span-3"],
+      ["Eval_Start","text","Evaluation start time"],
+      ["Eval_Complete","text","Evaluation completion time"]
+    ]],
+
+    ["Toxicology","toxicology",[
+      ["Oral_Fluid","text","Oral Fluid"],
+      ["Instrument_Number","text","Instrument #"],
+      ["Oral_Results","text","Oral fluid results"],
+      ["Urine","text","Urine"],
+      ["Blood","text","Blood"],
+      ["Collected_By","text","Collected By"]
+    ]],
+
+    ["Opinion / Flags","opinion",[
+      ["Indicated","text","Drug Categories Indicated","span-3"],
+      ["Opinion","textarea","DRE Opinion / Conclusion","span-3"],
+      ["Refused_All","text","Subject refused entire evaluation (Y/N/notes)","span-3"],
+      ["Stopped_Participating","text","Subject stopped participating during eval (Y/N/when)","span-3"]
+    ]]
+  ];
+
+  const formEl = document.getElementById("dreForm");
+
+  function build(){
+    formEl.innerHTML = "";
+    for (const [title, key, fields] of SCHEMA){
+      const sec = document.createElement("section");
+      sec.className = "sec";
+      sec.innerHTML = `<h2>${title}</h2>`;
+      const grid = document.createElement("div");
+      grid.className = fields.length <= 2 ? "grid one" : (fields.length <= 6 ? "grid two" : "grid");
+
+      for (const f of fields){
+        const [name, type, label, extra] = f;
+        const wrap = document.createElement("div");
+        if (extra && typeof extra === "string" && extra.startsWith("span-")) wrap.classList.add(extra);
+
+        if (type === "select"){
+          wrap.innerHTML = `<label>${label}
+            <select name="${name}" id="${name}">
+              ${(f[3]||[]).map(opt=>`<option value="${opt}">${opt}</option>`).join("")}
+            </select></label>`;
+
+        } else if (type === "miranda"){
+          wrap.innerHTML = `
+            <div class="group">
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                <label><input type="radio" name="Miranda" value="Yes"> Yes</label>
+                <label><input type="radio" name="Miranda" value="No"> No</label>
+                <input type="text" name="Miranda_Notes" id="Miranda_Notes" placeholder="Notes (optional)">
+              </div>
+            </div>`;
+
+        } else if (type === "crashExclusive"){
+          wrap.innerHTML = `
+            <div class="group">
+              <div class="group-title">${label} <span class="muted">(select one)</span></div>
+              <div class="inline" id="CrashGroup">
+                <label><input type="checkbox" name="Crash_None" value="true"> None</label>
+                <label><input type="checkbox" name="Crash_Fatal" value="true"> Fatal</label>
+                <label><input type="checkbox" name="Crash_Injury" value="true"> Injury</label>
+                <label><input type="checkbox" name="Crash_Property" value="true"> Property</label>
+              </div>
+            </div>`;
+
+        } else if (type === "chemicalMulti"){
+          wrap.innerHTML = `
+            <div class="group">
+              <div class="group-title">${label} <span class="muted">(select all that apply)</span></div>
+              <div class="inline">
+                <label><input type="checkbox" name="Chemical_Refused" value="true"> Refused</label>
+                <label><input type="checkbox" name="Chemical_OralFluid" value="true"> Oral Fluid</label>
+                <label><input type="checkbox" name="Chemical_Blood" value="true"> Blood</label>
+                <label><input type="checkbox" name="Chemical_Urine" value="true"> Urine</label>
+              </div>
+            </div>`;
+
+        } else if (type === "textarea"){
+          wrap.innerHTML = `<label>${label}<textarea name="${name}" id="${name}"></textarea></label>`;
+
+        } else {
+          const t = (type==="number") ? "number" : (type==="date"?"date":(type==="time"?"time":"text"));
+          wrap.innerHTML = `<label>${label}<input name="${name}" id="${name}" type="${t}"/></label>`;
+        }
+
+        grid.appendChild(wrap);
+      }
+
+      sec.appendChild(grid);
+      formEl.appendChild(sec);
+    }
+
+    // Enforce exclusive Crash checkboxes (only one checked at a time)
+    const crashInputs = formEl.querySelectorAll('#CrashGroup input[type="checkbox"]');
+    crashInputs.forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        if (cb.checked){
+          crashInputs.forEach(x=>{ if (x!==cb) x.checked = false; });
+        }
+      });
+    });
+  }
+
+  // ---------- Data helpers ----------
+  function dataFromForm(){
+    const data = {};
+    formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
+      .forEach(el => { if (el.name) data[el.name] = el.value; });
+
+    const m = formEl.querySelector('input[name="Miranda"]:checked');
+    if (m) data.Miranda = m.value;
+
+    ["Crash_None","Crash_Fatal","Crash_Injury","Crash_Property"].forEach(k=>{
+      const el = formEl.querySelector(`input[name="${k}"]`); if (el && el.checked) data[k] = true;
+    });
+    ["Chemical_Refused","Chemical_OralFluid","Chemical_Blood","Chemical_Urine"].forEach(k=>{
+      const el = formEl.querySelector(`input[name="${k}"]`); if (el && el.checked) data[k] = true;
+    });
+    return data;
+  }
+
+  async function postJSON(url, obj){
+    const res = await fetch(url,{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(obj)});
+    if(!res.ok) throw new Error(await res.text());
+    return res;
+  }
+
+  // ---------- Buttons ----------
+  document.getElementById("previewBtn").onclick = async ()=>{
+    try{
+      const res = await postJSON("/narrative", dataFromForm());
+      const { narrative } = await res.json();
+      document.getElementById("narrative").textContent = narrative || "(empty)";
+    }catch(e){ alert("Narrative error: "+e.message); }
+  };
+
+  document.getElementById("pdfBtn").onclick = async ()=>{
+    try{
+      const res = await postJSON("/pdf", dataFromForm());
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href=url; a.download="dre-report.pdf"; a.click();
+      URL.revokeObjectURL(url);
+    }catch(e){ alert("PDF error: "+e.message); }
+  };
+
+  document.getElementById("saveJson").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(dataFromForm(), null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href=url; a.download="dre-report.json"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  document.getElementById("loadJson").addEventListener("change", (ev)=>{
+    const f = ev.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        const data = JSON.parse(r.result);
+        formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
+          .forEach(el => { if (el.name && data[el.name] !== undefined) el.value = data[el.name]; });
+        const rb = formEl.querySelector(`input[name="Miranda"][value="${data.Miranda}"]`);
+        if (rb) rb.checked = true;
+        if (data.Miranda_Notes) document.getElementById("Miranda_Notes").value = data.Miranda_Notes;
+        ["Crash_None","Crash_Fatal","Crash_Injury","Crash_Property"].forEach(k=>{
+          const el = formEl.querySelector(`input[name="${k}"]`); if (el) el.checked = !!data[k];
+        });
+        ["Chemical_Refused","Chemical_OralFluid","Chemical_Blood","Chemical_Urine"].forEach(k=>{
+          const el = formEl.querySelector(`input[name="${k}"]`); if (el) el.checked = !!data[k];
+        });
+      }catch{ alert("Invalid JSON");}
+    };
+    r.readAsText(f);
+  });
+
+  document.getElementById("clearBtn").onclick = ()=>{
+    formEl.querySelectorAll("input,textarea,select").forEach(el=>{
+      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
+      else el.value = "";
+    });
+    document.getElementById("narrative").textContent = "";
+  };
+
+  // init
+  build();
+</script>
+</body>
+</html>
