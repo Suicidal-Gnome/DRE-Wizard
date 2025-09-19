@@ -78,7 +78,8 @@
       ["Rolling_Log_Number","text","Rolling Log #"],
       // Row 2
       ["Case_Number","text","Case #"],
-      ["Recorder","text","Recorder / Witnesses","span-2"],
+      ["Incident_Number","text","Incident #"],
+      ["Recorder","text","Recorder / Witnesses","span-3"],
       // Row 3
       ["Arresting_Officer","text","Arresting Officer"],
       ["Arresting_Agency","text","Officer’s Agency","span-2"],
@@ -209,6 +210,20 @@
     ]]
   ];
 
+  const CRASH_OPTIONS = [
+    { field: "Crash_None", label: "None" },
+    { field: "Crash_Fatal", label: "Fatal" },
+    { field: "Crash_Injury", label: "Injury" },
+    { field: "Crash_Property", label: "Property" }
+  ];
+
+  const CHEMICAL_OPTIONS = [
+    { field: "Chemical_Refused", label: "Refused" },
+    { field: "Chemical_OralFluid", label: "Oral Fluid" },
+    { field: "Chemical_Blood", label: "Blood" },
+    { field: "Chemical_Urine", label: "Urine" }
+  ];
+
   const formEl = document.getElementById("dreForm");
 
   function build(){
@@ -301,12 +316,25 @@
     const m = formEl.querySelector('input[name="Miranda"]:checked');
     if (m) data.Miranda = m.value;
 
-    ["Crash_None","Crash_Fatal","Crash_Injury","Crash_Property"].forEach(k=>{
-      const el = formEl.querySelector(`input[name="${k}"]`); if (el && el.checked) data[k] = true;
+    let crashValue = "";
+    CRASH_OPTIONS.forEach(({ field, label }) => {
+      const el = formEl.querySelector(`input[name="${field}"]`);
+      if (el && el.checked) {
+        data[field] = true;
+        if (!crashValue) crashValue = label;
+      }
     });
-    ["Chemical_Refused","Chemical_OralFluid","Chemical_Blood","Chemical_Urine"].forEach(k=>{
-      const el = formEl.querySelector(`input[name="${k}"]`); if (el && el.checked) data[k] = true;
+    if (crashValue) data.Crash = crashValue;
+
+    const chemicalSelections = [];
+    CHEMICAL_OPTIONS.forEach(({ field, label }) => {
+      const el = formEl.querySelector(`input[name="${field}"]`);
+      if (el && el.checked) {
+        data[field] = true;
+        chemicalSelections.push(label);
+      }
     });
+    if (chemicalSelections.length) data.Chemical_Test = chemicalSelections.join(", ");
     return data;
   }
 
@@ -353,11 +381,27 @@
         const rb = formEl.querySelector(`input[name="Miranda"][value="${data.Miranda}"]`);
         if (rb) rb.checked = true;
         if (data.Miranda_Notes) document.getElementById("Miranda_Notes").value = data.Miranda_Notes;
-        ["Crash_None","Crash_Fatal","Crash_Injury","Crash_Property"].forEach(k=>{
-          const el = formEl.querySelector(`input[name="${k}"]`); if (el) el.checked = !!data[k];
+        const crashLabel = (data.Crash || "").toLowerCase();
+        CRASH_OPTIONS.forEach(({ field, label }) => {
+          const el = formEl.querySelector(`input[name="${field}"]`);
+          if (el) {
+            const matchFromString = crashLabel && crashLabel === label.toLowerCase();
+            el.checked = !!(data[field] || matchFromString);
+          }
         });
-        ["Chemical_Refused","Chemical_OralFluid","Chemical_Blood","Chemical_Urine"].forEach(k=>{
-          const el = formEl.querySelector(`input[name="${k}"]`); if (el) el.checked = !!data[k];
+
+        const chemicalLabels = new Set(
+          (data.Chemical_Test || "")
+            .split(",")
+            .map(s => s.trim().toLowerCase())
+            .filter(Boolean)
+        );
+        CHEMICAL_OPTIONS.forEach(({ field, label }) => {
+          const el = formEl.querySelector(`input[name="${field}"]`);
+          if (el) {
+            const matchFromString = chemicalLabels.has(label.toLowerCase());
+            el.checked = !!(data[field] || matchFromString);
+          }
         });
       }catch{ alert("Invalid JSON");}
     };
