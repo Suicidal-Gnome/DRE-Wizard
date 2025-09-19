@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>DRE Face Sheet & Narrative</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<style>
+  @page { size: Letter; margin: 10mm; }
+  * { box-sizing: border-box }
+  body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:0 }
+  .sheet { page-break-after: always; padding: 0 }
+  .title { text-align:center; font-weight:700; font-size:16px; margin:0 0 6px }
+  .subtitle { text-align:center; color:#4b5563; font-size:11px; margin:0 0 6px }
+  .section { font-weight:700; color:#0b3e7a; margin:10px 0 6px }
+  .kv { display:grid; grid-template-columns: 170px 1fr; gap:6px 10px; align-items:center; margin-bottom:6px }
+  .k { font-weight:700; color:#0b3e7a; font-size:12px }
+  .v { border-bottom:1px solid #cfd8ea; min-height:18px; padding:1px 0; font-size:12px }
+  .grid-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px 12px }
+  .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:6px 12px }
+  .box { border:1px solid #cfd8ea; border-radius:6px; padding:8px; margin-top:8px }
+  .foot { text-align:right; font-size:10px; color:#6b7280; margin-top:6px }
+  .narr { white-space:pre-wrap; line-height:1.35; font-size:12px }
+  .table { width:100%; border-collapse:collapse; font-size:12px; margin-top:4px }
+  .table th,.table td { border:1px solid #cfd8ea; padding:4px 6px; vertical-align:top }
+  .chk { display:inline-block; width:10px; height:10px; border:1px solid #6b7280; margin-right:6px; vertical-align:middle }
+  .fill { width:100%; height:100%; background:#111 }
+</style>
+</head>
+<body>
+
+<!-- ===================== FACE SHEET — PAGE 1 ===================== -->
+<div class="sheet">
+  <div class="title">TEXAS DRUG INFLUENCE EVALUATION — FACE SHEET</div>
+  <div class="subtitle">Page 1 — Case/Evaluator · Subject · Interview · Medical/Physical · Preliminary Exam</div>
+
+  <!-- Case / Evaluator -->
+  <div class="section">Case / Evaluator</div>
+  <div class="grid-3">
+    <div class="kv"><div class="k">Evaluator</div><div class="v"><%= data.Evaluator || "" %></div></div>
+    <div class="kv"><div class="k">DRE #</div><div class="v"><%= data.DRE_Number || "" %></div></div>
+    <div class="kv"><div class="k">Rolling Log #</div><div class="v"><%= data.Rolling_Log_Number || "" %></div></div>
+
+    <div class="kv"><div class="k">Case #</div><div class="v"><%= data.Case_Number || "" %></div></div>
+    <div class="kv"><div class="k">Incident #</div><div class="v"><%= data.Incident_Number || "" %></div></div>
+    <div class="kv"><div class="k">Recorder / Witnesses</div><div class="v"><%= data.Recorder || "" %></div></div>
+
+    <div class="kv"><div class="k">Arresting Officer</div><div class="v"><%= data.Arresting_Officer || "" %></div></div>
+    <div class="kv"><div class="k">Officer’s Agency</div><div class="v"><%= data.Arresting_Agency || "" %></div></div>
+    <div class="kv"><div class="k">Crash</div><div class="v"><%= data.Crash || "" %></div></div>
+
+    <div class="kv"><div class="k">Location</div><div class="v"><%= data.Location || "" %></div></div>
+    <div class="kv"><div class="k">Chemical Test</div><div class="v"><%= data.Chemical_Test || "" %></div></div>
+    <div class="kv"><div class="k">Miranda Warning Given</div><div class="v"><%= data.Miranda || "" %></div></div>
+
+    <div class="kv"><div class="k">Date Examined</div><div class="v"><%= data.Eval_Date || "" %></div></div>
+    <div class="kv"><div class="k">Time Examined</div><div class="v"><%= data.Eval_Time || "" %></div></div>
+    <div></div>
+  </div>
+
+  <!-- Subject -->
+  <div class="section">Subject</div>
+  <div class="grid-3">
+    <div class="kv"><div class="k">Arrestee’s Name (Last, First, MI)</div><div class="v"><%= data.Subject_Name || "" %></div></div>
+    <div class="kv"><div class="k">DOB</div><div class="v"><%= data.Subject_DOB || "" %></div></div>
+    <div class="kv"><div class="k">Age</div><div class="v"><%= data.Subject_Age || "" %></div></div>
+
+    <div class="kv"><div class="k">Sex</div><div class="v"><%= data.Subject_Gender || "" %></div></div>
+    <div class="kv"><div class="k">Race</div><div class="v"><%= data.Subject_Race || "" %></div></div>
+    <div class="kv"><div class="k">Breath Test</div><div class="v"><%= data.Breath_Result || "" %></div></div>
+  </div>
+
+  <!-- Interview -->
+  <div class="box">
+    <div class="section">Interview</div>
+    <div class="grid-2">
+      <div class="kv"><div class="k">What have you eaten today? When?</div><div class="v"><%= data.Food_When || "" %></div></div>
+      <div class="kv"><div class="k">What have you been drinking? How much? Time of last drink?</div><div class="v"><%= data.Drinking || "" %></div></div>
+      <div class="kv"><div class="k">Time now — Actual</div><div class="v"><%= data.Time_Now || "" %></div></div>
+      <div class="kv"><div class="k">When did you last sleep? How long?</div><div class="v"><%= data.Sleep || "" %></div></div>
+    </div>
+  </div>
+
+  <!-- Medical / Physical -->
+  <div class="box">
+    <div class="section">Medical / Physical</div>
+    <div class="grid-2">
+      <div class="kv"><div class="k">Sick or injured?</div><div class="v"><%= data.Sick_Injured || "" %></div></div>
+      <div class="kv"><div class="k">Diabetic or epileptic?</div><div class="v"><%= data.Diabetic_Epileptic || "" %></div></div>
+      <div class="kv"><div class="k">Take insulin?</div><div class="v"><%= data.Insulin || "" %></div></div>
+      <div class="kv"><div class="k">Physical defects?</div><div class="v"><%= data.Physical_Defects || "" %></div></div>
+      <div class="kv"><div class="k">Under doctor/dentist care?</div><div class="v"><%= data.Under_Doctor || "" %></div></div>
+      <div class="kv"><div class="k">Medication / drugs?</div><div class="v"><%= data.Medication_Drugs || "" %></div></div>
+    </div>
+  </div>
+
+  <!-- Preliminary Exam -->
+  <div class="box">
+    <div class="section">Preliminary Exam</div>
+    <table class="table">
+      <tr>
+        <th>Attitude</th><td><%= data.Attitude || "" %></td>
+        <th>Coordination</th><td><%= data.Coordination || "" %></td>
+        <th>Speech</th><td><%= data.Speech || "" %></td>
+      </tr>
+      <tr>
+        <th>Breath Odor</th><td><%= data.Breath_Odor || "" %></td>
+        <th>Face</th><td><%= data.Face || "" %></td>
+        <th>Corrective Lenses</th><td><%= data.Corrective_Lenses || "" %></td>
+      </tr>
+      <tr>
+        <th>Eyes Blindness</th><td><%= data.Eyes_Blindness || "" %></td>
+        <th>Tracking</th><td><%= data.Tracking || "" %></td>
+        <th>Follow Stimulus</th><td><%= data.Follow_Stimulus || "" %></td>
+      </tr>
+      <tr>
+        <th>Pupil size (explain)</th><td colspan="3"><%= data.Pupil_Explain || "" %></td>
+        <th>Eyelids</th><td><%= data.Eyelids || "" %></td>
+      </tr>
+      <tr>
+        <th>Resting Nystagmus</th><td><%= data.Resting_Nyst || "" %></td>
+        <th>Vertical Nystagmus</th><td><%= data.Vertical_Nyst || "" %></td>
+        <th>First Pulse / Time</th><td><%= data.Pulse1 || "" %></td>
+      </tr>
+      <tr>
+        <th>Preliminary Exam Notes</th><td colspan="5"><%= data.Prelim_Notes || "" %></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="foot">Revised 02/2023 — Face Sheet Page 1</div>
+</div>
+
+<!-- ===================== FACE SHEET — PAGE 2 ===================== -->
+<div class="sheet">
+  <div class="title">TEXAS DRUG INFLUENCE EVALUATION — FACE SHEET</div>
+  <div class="subtitle">Page 2 — HGN/VGN/Convergence · Psychophysical · Vitals/Pupils · Oral/Nasal · Drug Use · Timeline · Toxicology · Opinion</div>
+
+  <!-- HGN / VGN / Convergence -->
+  <div class="section">HGN / VGN / Convergence</div>
+  <table class="table">
+    <tr>
+      <th>HGN Left Eye</th><td><%= data.HGN_Left || data.HGN || "" %></td>
+      <th>HGN Right Eye</th><td><%= data.HGN_Right || data.HGN || "" %></td>
+      <th>VGN</th><td><%= data.VGN || "" %></td>
+    </tr>
+    <tr>
+      <th>Lack of Smooth Pursuit</th><td><%= data.HGN_LSP || "" %></td>
+      <th>Maximum Deviation</th><td><%= data.HGN_MD || "" %></td>
+      <th>Angle of Onset</th><td><%= data.HGN_AOO || "" %></td>
+    </tr>
+    <tr>
+      <th>Lack of Convergence</th><td colspan="5"><%= data.LOC || "" %></td>
+    </tr>
+  </table>
+
+  <!-- Psychophysical Tests -->
+  <div class="section">Psychophysical Tests</div>
+  <table class="table">
+    <tr><th>Modified Romberg Balance Test</th><td><%= data.Romberg || "" %></td></tr>
+    <tr><th>Time Estimation (30s)</th><td><%= data.MRomberg || "" %></td></tr>
+    <tr><th>Walk and Turn (notes)</th><td><%= data.WnT || "" %></td></tr>
+    <tr><th>One Leg Stand (L/R)</th><td><%= data.OLS || "" %></td></tr>
+    <tr><th>Finger to Nose</th><td><%= data.FTN || "" %></td></tr>
+  </table>
+
+  <!-- Vitals & Pupils -->
+  <div class="section">Vital Signs & Pupils</div>
+  <table class="table">
+    <tr>
+      <th>Second Pulse / Time</th><td><%= data.Pulse2 || "" %></td>
+      <th>Blood Pressure</th><td><%= data.BP || "" %></td>
+      <th>Body Temperature</th><td><%= data.Temp || "" %></td>
+    </tr>
+    <tr>
+      <th>Pupil Size — Room</th><td><%= data.Pupil_Room || "" %></td>
+      <th>Pupil Size — Darkness</th><td><%= data.Pupil_Dark || "" %></td>
+      <th>Pupil Size — Direct/Near</th><td><%= data.Pupil_Near || "" %></td>
+    </tr>
+    <tr>
+      <th>Reaction to Light</th><td><%= data.Pupil_LightReact || "" %></td>
+      <th>Third Pulse / Time</th><td><%= data.Pulse3 || "" %></td>
+      <th>UV Light used</th><td><%= data.UV_Used || "" %></td>
+    </tr>
+  </table>
+
+  <!-- Oral / Nasal Cavity -->
+  <div class="section">Oral / Nasal Cavity</div>
+  <table class="table">
+    <tr><th>Oral Cavity</th><td><%= data.Oral_Cavity || "" %></td></tr>
+    <tr><th>Nasal Cavity</th><td><%= data.Nasal_Cavity || "" %></td></tr>
+    <tr><th>Rebound Dilation</th><td><%= data.Rebound_Dilation || "" %></td></tr>
+  </table>
+
+  <!-- Drug Use Details -->
+  <div class="section">Drug Use Details</div>
+  <table class="table">
+    <tr><th>What drugs/medications have you been using?</th><td><%= data.Drugs_Used || "" %></td></tr>
+    <tr><th>How much?</th><td><%= data.Dose || "" %></td></tr>
+    <tr><th>Time of use</th><td><%= data.Time_of_Use || "" %></td></tr>
+    <tr><th>Where were the drugs used?</th><td><%= data.Where_Used || "" %></td></tr>
+    <tr><th>Signs of ingestion</th><td><%= data.Ingestion || "" %></td></tr>
+  </table>
+
+  <!-- Timeline -->
+  <div class="section">Timeline</div>
+  <table class="table">
+    <tr>
+      <th>Date/time of arrest</th><td><%= data.Arrest_DateTime || "" %></td>
+      <th>Time DRE notified</th><td><%= data.DRE_Notified || "" %></td>
+    </tr>
+    <tr>
+      <th>Evaluation start</th><td><%= data.Eval_Start || data.Eval_Time || "" %></td>
+      <th>Evaluation complete</th><td><%= data.Eval_Complete || "" %></td>
+    </tr>
+  </table>
+
+  <!-- Toxicology -->
+  <div class="section">Toxicology</div>
+  <table class="table">
+    <tr>
+      <th>Oral Fluid</th><td><%= data.Oral_Fluid || "" %></td>
+      <th>Instrument #</th><td><%= data.Instrument_Number || "" %></td>
+      <th>Results</th><td><%= data.Oral_Results || "" %></td>
+    </tr>
+    <tr>
+      <th>Urine</th><td><%= data.Urine || "" %></td>
+      <th>Blood</th><td><%= data.Blood || "" %></td>
+      <th>Collected By</th><td><%= data.Collected_By || "" %></td>
+    </tr>
+  </table>
+
+  <!-- Opinion / Flags -->
+  <div class="section">Opinion of Evaluator</div>
+  <table class="table">
+    <tr><th>Drug Categories Indicated</th><td><%= data.Indicated || "" %></td></tr>
+    <tr><th>Opinion</th><td><%= data.Opinion || "" %></td></tr>
+    <tr>
+      <th>Refused entire evaluation</th>
+      <td>
+        <span class="chk"><% if (String(data.Refused_All||"").match(/^(1|true|yes|present|refused)$/i)) { %><span class="fill"></span><% } %></span>
+        <%= data.Refused_All || "" %>
+      </td>
+    </tr>
+    <tr>
+      <th>Stopped participating during evaluation</th>
+      <td>
+        <span class="chk"><% if (String(data.Stopped_Participating||"").match(/^(1|true|yes|present|refused)$/i)) { %><span class="fill"></span><% } %></span>
+        <%= data.Stopped_Participating || "" %>
+      </td>
+    </tr>
+  </table>
+
+  <div class="grid-3" style="margin-top:8px">
+    <div class="kv"><div class="k">DRE’s Signature</div><div class="v" style="height:22px"></div></div>
+    <div class="kv"><div class="k">Approved by & DRE number</div><div class="v" style="height:22px"></div></div>
+    <div class="kv"><div class="k">Date</div><div class="v" style="height:22px"></div></div>
+  </div>
+
+  <div class="foot">Revised 02/2023 — Face Sheet Page 2</div>
+</div>
+
+<!-- ===================== NARRATIVE ===================== -->
+<div class="sheet">
+  <div class="title">Drug Recognition Evaluation — Narrative</div>
+  <div class="narr"><%= (data.Narrative || "").trim() %></div>
+</div>
+
+</body>
+</html>
