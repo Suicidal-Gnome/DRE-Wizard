@@ -25,6 +25,9 @@
     .span-2{grid-column:span 2}
     .span-3{grid-column:span 3}
 
+    .subheading{font-size:11px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px}
+    .group .subheading{margin:0}
+
     label{display:block;font-size:12px;color:var(--muted)}
     input,textarea,select{
       width:100%;margin-top:4px;padding:8px;border:1px solid var(--line);
@@ -39,7 +42,8 @@
     }
     .group-title{font-size:12px;color:var(--muted);margin-bottom:6px}
     .inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-    .inline input[type="text"]{min-width:260px}
+    .inline input[type="text"],
+    .inline select{min-width:180px}
 
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
     button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 12px;font-weight:600;cursor:pointer}
@@ -72,26 +76,23 @@
   // ========== Schema (with improved Case/Evaluator layout & outlined groups) ==========
   const SCHEMA = [
     ["Case / Evaluator","case",[
-      // Row 1
+      ["CaseEval_Evaluator","subheading","Evaluator"],
       ["Evaluator","text","Evaluator (DRE Name)"],
       ["DRE_Number","text","DRE #"],
       ["Rolling_Log_Number","text","Rolling Log #"],
-      // Row 2
+      ["Recorder","text","Recorder / Witnesses","span-3"],
+      ["CaseEval_Case","subheading","Case Details"],
       ["Case_Number","text","Case #"],
       ["Incident_Number","text","Incident #"],
-      ["Recorder","text","Recorder / Witnesses","span-3"],
-      // Row 3
       ["Arresting_Officer","text","Arresting Officer"],
       ["Arresting_Agency","text","Officer’s Agency","span-2"],
-      // Row 4
-      ["Location","text","Evaluation Location","span-3"],
-      // Row 5 — groups: each spans one column (Miranda spans 2 so notes have room)
-      ["Crash_Group","crashExclusive","Crash"],
-      ["Chemical_Group","chemicalMulti","Chemical Test"],
-      ["Miranda_Group","miranda","Miranda Warning Given","span-2"],
-      // Row 6
+      ["CaseEval_Logistics","subheading","Evaluation Logistics"],
       ["Eval_Date","date","Date Examined"],
       ["Eval_Time","time","Time Examined"],
+      ["Location_Block","location","Evaluation Location"],
+      ["Crash_Group","crashExclusive","Crash"],
+      ["Chemical_Group","chemicalMulti","Chemical Test"],
+      ["Miranda_Group","miranda","Miranda Warning Given","span-3"],
     ]],
 
     ["Subject","subject",[
@@ -110,7 +111,9 @@
 
     ["Interview","interview",[
       ["Food_When","text","What have you eaten today? When?","span-3"],
-      ["Drinking","text","What have you been drinking? How much? Time of last drink?","span-3"],
+      ["Drinking_When","text","When have you been drinking?"],
+      ["Drinking_HowMuch","text","How much have you had?"],
+      ["Drinking_LastTime","text","Time of last drink"],
       ["Time_Now","text","Time now — Actual"],
       ["Sleep","text","When did you last sleep? How long?","span-2"]
     ]],
@@ -224,6 +227,61 @@
     { field: "Chemical_Urine", label: "Urine" }
   ];
 
+  const STATE_OPTIONS = [
+    ["", "Select State"],
+    ["Alabama", "Alabama (AL)"],
+    ["Alaska", "Alaska (AK)"],
+    ["Arizona", "Arizona (AZ)"],
+    ["Arkansas", "Arkansas (AR)"],
+    ["California", "California (CA)"],
+    ["Colorado", "Colorado (CO)"],
+    ["Connecticut", "Connecticut (CT)"],
+    ["Delaware", "Delaware (DE)"],
+    ["District of Columbia", "District of Columbia (DC)"],
+    ["Florida", "Florida (FL)"],
+    ["Georgia", "Georgia (GA)"],
+    ["Hawaii", "Hawaii (HI)"],
+    ["Idaho", "Idaho (ID)"],
+    ["Illinois", "Illinois (IL)"],
+    ["Indiana", "Indiana (IN)"],
+    ["Iowa", "Iowa (IA)"],
+    ["Kansas", "Kansas (KS)"],
+    ["Kentucky", "Kentucky (KY)"],
+    ["Louisiana", "Louisiana (LA)"],
+    ["Maine", "Maine (ME)"],
+    ["Maryland", "Maryland (MD)"],
+    ["Massachusetts", "Massachusetts (MA)"],
+    ["Michigan", "Michigan (MI)"],
+    ["Minnesota", "Minnesota (MN)"],
+    ["Mississippi", "Mississippi (MS)"],
+    ["Missouri", "Missouri (MO)"],
+    ["Montana", "Montana (MT)"],
+    ["Nebraska", "Nebraska (NE)"],
+    ["Nevada", "Nevada (NV)"],
+    ["New Hampshire", "New Hampshire (NH)"],
+    ["New Jersey", "New Jersey (NJ)"],
+    ["New Mexico", "New Mexico (NM)"],
+    ["New York", "New York (NY)"],
+    ["North Carolina", "North Carolina (NC)"],
+    ["North Dakota", "North Dakota (ND)"],
+    ["Ohio", "Ohio (OH)"],
+    ["Oklahoma", "Oklahoma (OK)"],
+    ["Oregon", "Oregon (OR)"],
+    ["Pennsylvania", "Pennsylvania (PA)"],
+    ["Rhode Island", "Rhode Island (RI)"],
+    ["South Carolina", "South Carolina (SC)"],
+    ["South Dakota", "South Dakota (SD)"],
+    ["Tennessee", "Tennessee (TN)"],
+    ["Texas", "Texas (TX)"],
+    ["Utah", "Utah (UT)"],
+    ["Vermont", "Vermont (VT)"],
+    ["Virginia", "Virginia (VA)"],
+    ["Washington", "Washington (WA)"],
+    ["West Virginia", "West Virginia (WV)"],
+    ["Wisconsin", "Wisconsin (WI)"],
+    ["Wyoming", "Wyoming (WY)"]
+  ];
+
   const formEl = document.getElementById("dreForm");
 
   function build(){
@@ -240,11 +298,40 @@
         const wrap = document.createElement("div");
         if (extra && typeof extra === "string" && extra.startsWith("span-")) wrap.classList.add(extra);
 
-        if (type === "select"){
+        if (type === "subheading"){
+          wrap.classList.add("span-3");
+          wrap.innerHTML = `<div class="subheading">${label}</div>`;
+
+        } else if (type === "select"){
+          const opts = f[3] || [];
           wrap.innerHTML = `<label>${label}
             <select name="${name}" id="${name}">
-              ${(f[3]||[]).map(opt=>`<option value="${opt}">${opt}</option>`).join("")}
+              ${opts
+                .map(opt => Array.isArray(opt)
+                  ? `<option value="${opt[0]}">${opt[1]}</option>`
+                  : `<option value="${opt}">${opt}</option>`)
+                .join("")}
             </select></label>`;
+
+        } else if (type === "location"){
+          wrap.classList.add("span-3");
+          wrap.innerHTML = `
+            <div class="group">
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                <label style="flex:1 1 240px">Address
+                  <input type="text" name="Location" id="Location" placeholder="Street / facility" />
+                </label>
+                <label style="flex:0 0 160px">State
+                  <select name="Location_State" id="Location_State">
+                    ${STATE_OPTIONS.map(opt => `<option value="${opt[0]}">${opt[1]}</option>`).join("")}
+                  </select>
+                </label>
+                <label style="flex:1 1 200px">County / Parish / Borough
+                  <input type="text" name="Location_County" id="Location_County" placeholder="Jurisdiction" />
+                </label>
+              </div>
+            </div>`;
 
         } else if (type === "miranda"){
           wrap.innerHTML = `
@@ -286,7 +373,9 @@
 
         } else {
           const t = (type==="number") ? "number" : (type==="date"?"date":(type==="time"?"time":"text"));
-          wrap.innerHTML = `<label>${label}<input name="${name}" id="${name}" type="${t}"/></label>`;
+          const readonly = name === "Subject_Age" ? " readonly" : "";
+          const placeholder = name === "Subject_Age" ? " placeholder=\"Auto calculated\"" : "";
+          wrap.innerHTML = `<label>${label}<input name="${name}" id="${name}" type="${t}"${readonly}${placeholder}/></label>`;
         }
 
         grid.appendChild(wrap);
@@ -305,10 +394,60 @@
         }
       });
     });
+
+    setupComputedListeners();
   }
 
   // ---------- Data helpers ----------
+  function updateComputedAge(){
+    const ageInput = formEl.querySelector("#Subject_Age");
+    const dobInput = formEl.querySelector("#Subject_DOB");
+    if (!ageInput || !dobInput){
+      return;
+    }
+
+    const dobValue = dobInput.value;
+    if (!dobValue){
+      ageInput.value = "";
+      return;
+    }
+
+    const birth = new Date(dobValue + "T00:00:00");
+    if (Number.isNaN(birth.getTime())){
+      ageInput.value = "";
+      return;
+    }
+
+    const evalDateInput = formEl.querySelector("#Eval_Date");
+    const refValue = evalDateInput && evalDateInput.value ? evalDateInput.value : null;
+    const refDate = refValue ? new Date(refValue + "T00:00:00") : new Date();
+    if (Number.isNaN(refDate.getTime())){
+      ageInput.value = "";
+      return;
+    }
+
+    let age = refDate.getFullYear() - birth.getFullYear();
+    const monthDiff = refDate.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && refDate.getDate() < birth.getDate())){
+      age -= 1;
+    }
+    ageInput.value = age >= 0 ? age : "";
+  }
+
+  function setupComputedListeners(){
+    const dobInput = formEl.querySelector("#Subject_DOB");
+    const evalDateInput = formEl.querySelector("#Eval_Date");
+    [dobInput, evalDateInput].forEach(el => {
+      if (el){
+        el.addEventListener("input", updateComputedAge);
+        el.addEventListener("change", updateComputedAge);
+      }
+    });
+    updateComputedAge();
+  }
+
   function dataFromForm(){
+    updateComputedAge();
     const data = {};
     formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
       .forEach(el => { if (el.name) data[el.name] = el.value; });
@@ -335,6 +474,12 @@
       }
     });
     if (chemicalSelections.length) data.Chemical_Test = chemicalSelections.join(", ");
+
+    const drinkingSummary = [];
+    if (data.Drinking_When) drinkingSummary.push(`When: ${data.Drinking_When}`);
+    if (data.Drinking_HowMuch) drinkingSummary.push(`How much: ${data.Drinking_HowMuch}`);
+    if (data.Drinking_LastTime) drinkingSummary.push(`Last drink: ${data.Drinking_LastTime}`);
+    if (drinkingSummary.length) data.Drinking = drinkingSummary.join(" | ");
     return data;
   }
 
@@ -378,6 +523,10 @@
         const data = JSON.parse(r.result);
         formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
           .forEach(el => { if (el.name && data[el.name] !== undefined) el.value = data[el.name]; });
+        if (data.Drinking && !data.Drinking_When && !data.Drinking_HowMuch && !data.Drinking_LastTime){
+          const drinkWhen = formEl.querySelector('#Drinking_When');
+          if (drinkWhen) drinkWhen.value = data.Drinking;
+        }
         const rb = formEl.querySelector(`input[name="Miranda"][value="${data.Miranda}"]`);
         if (rb) rb.checked = true;
         if (data.Miranda_Notes) document.getElementById("Miranda_Notes").value = data.Miranda_Notes;
@@ -403,6 +552,7 @@
             el.checked = !!(data[field] || matchFromString);
           }
         });
+        updateComputedAge();
       }catch{ alert("Invalid JSON");}
     };
     r.readAsText(f);
@@ -414,6 +564,7 @@
       else el.value = "";
     });
     document.getElementById("narrative").textContent = "";
+    updateComputedAge();
   };
 
   // init

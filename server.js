@@ -17,11 +17,21 @@ function buildNarrative(input = {}) {
   const parts = [];
   const name = d.Subject_Name || "the subject";
   const recorder = d.Recorder || d.Arresting_Officer || "a witness";
-  const loc = d.Location ? ` at ${d.Location}` : "";
+  const locationParts = [];
+  if (d.Location) locationParts.push(d.Location);
+  const jurisdiction = [d.Location_County, d.Location_State].filter(Boolean).join(", ");
+  if (jurisdiction) locationParts.push(jurisdiction);
+  const loc = locationParts.length ? ` at ${locationParts.join(", ")}` : "";
   const dt = [d.Eval_Date, d.Eval_Time].filter(Boolean).join(" ");
   parts.push(
     `On ${dt}${loc}, I conducted a Drug Influence Evaluation of ${name}. ${recorder} was present as recorder/witness.`
   );
+  if (d.Food_When) parts.push(`Subject reported eating: ${d.Food_When}.`);
+  const drinkDetails = [];
+  if (d.Drinking_When) drinkDetails.push(`when drinking: ${d.Drinking_When}`);
+  if (d.Drinking_HowMuch) drinkDetails.push(`amount consumed: ${d.Drinking_HowMuch}`);
+  if (d.Drinking_LastTime) drinkDetails.push(`time of last drink: ${d.Drinking_LastTime}`);
+  if (drinkDetails.length) parts.push(`Alcohol use details — ${drinkDetails.join("; ")}.`);
   if (d.Breath_Result) parts.push(`Breath test: ${d.Breath_Result}.`);
   if (d.Ingestion) parts.push(`Signs of ingestion observed: ${d.Ingestion}.`);
   if (d.Medication_Drugs) parts.push(`Medication/Drugs reported: ${d.Medication_Drugs}.`);
