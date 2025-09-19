@@ -1,0 +1,17 @@
+{
+  "name": "dre-wizard-pdf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DRE multi-step wizard with face sheet-accurate PDF export (Node + Express + Puppeteer)",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "NODE_ENV=production node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "puppeteer": "^23.4.1",
+    "body-parser": "^1.20.2"
+  }
+}
