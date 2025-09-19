@@ -28,6 +28,11 @@
 </head>
 <body>
 
+<% function listText(val){
+  if (Array.isArray(val)) return val.join(', ');
+  return val || '';
+} %>
+
 <!-- ===================== FACE SHEET — PAGE 1 ===================== -->
 <div class="sheet">
   <div class="title">TEXAS DRUG INFLUENCE EVALUATION — FACE SHEET</div>
@@ -74,9 +79,13 @@
     <div class="section">Interview</div>
     <div class="grid-2">
       <div class="kv"><div class="k">What have you eaten today? When?</div><div class="v"><%= data.Food_When || "" %></div></div>
-      <div class="kv"><div class="k">What have you been drinking? How much? Time of last drink?</div><div class="v"><%= data.Drinking || "" %></div></div>
-      <div class="kv"><div class="k">Time now — Actual</div><div class="v"><%= data.Time_Now || "" %></div></div>
-      <div class="kv"><div class="k">When did you last sleep? How long?</div><div class="v"><%= data.Sleep || "" %></div></div>
+      <div class="kv"><div class="k">When have you been drinking?</div><div class="v"><%= data.Drinking_When || "" %></div></div>
+      <div class="kv"><div class="k">How much have you had?</div><div class="v"><%= data.Drinking_HowMuch || "" %></div></div>
+      <div class="kv"><div class="k">Time of last drink</div><div class="v"><%= data.Drinking_LastTime || "" %></div></div>
+      <div class="kv"><div class="k">Time now (stated)</div><div class="v"><%= data.Time_Now_Subjective || "" %></div></div>
+      <div class="kv"><div class="k">Actual current time</div><div class="v"><%= data.Time_Now_Actual || "" %></div></div>
+      <div class="kv"><div class="k">Last slept</div><div class="v"><%= data.Sleep_Last || "" %></div></div>
+      <div class="kv"><div class="k">Sleep duration</div><div class="v"><%= data.Sleep_Length || "" %></div></div>
     </div>
   </div>
 
@@ -84,12 +93,12 @@
   <div class="box">
     <div class="section">Medical / Physical</div>
     <div class="grid-2">
-      <div class="kv"><div class="k">Sick or injured?</div><div class="v"><%= data.Sick_Injured || "" %></div></div>
-      <div class="kv"><div class="k">Diabetic or epileptic?</div><div class="v"><%= data.Diabetic_Epileptic || "" %></div></div>
+      <div class="kv"><div class="k">Sick or injured?</div><div class="v"><%= data.Sick_Injured || data.Sick_Injured_Answer || "" %></div></div>
+      <div class="kv"><div class="k">Diabetic or epileptic?</div><div class="v"><%= data.Diabetic_Epileptic || data.Diabetic_Epileptic_Answer || "" %></div></div>
       <div class="kv"><div class="k">Take insulin?</div><div class="v"><%= data.Insulin || "" %></div></div>
-      <div class="kv"><div class="k">Physical defects?</div><div class="v"><%= data.Physical_Defects || "" %></div></div>
-      <div class="kv"><div class="k">Under doctor/dentist care?</div><div class="v"><%= data.Under_Doctor || "" %></div></div>
-      <div class="kv"><div class="k">Medication / drugs?</div><div class="v"><%= data.Medication_Drugs || "" %></div></div>
+      <div class="kv"><div class="k">Physical defects?</div><div class="v"><%= data.Physical_Defects || data.Physical_Defects_Answer || "" %></div></div>
+      <div class="kv"><div class="k">Under doctor/dentist care?</div><div class="v"><%= data.Under_Doctor || data.Under_Doctor_Answer || "" %></div></div>
+      <div class="kv"><div class="k">Medication / drugs?</div><div class="v"><%= data.Medication_Drugs || data.Medication_Drugs_Answer || "" %></div></div>
     </div>
   </div>
 
@@ -105,21 +114,25 @@
       <tr>
         <th>Breath Odor</th><td><%= data.Breath_Odor || "" %></td>
         <th>Face</th><td><%= data.Face || "" %></td>
+        <th>First Pulse</th><td><%= data.Pulse1_Rate || data.Pulse1 || "" %></td>
+      </tr>
+      <tr>
+        <th>First Pulse Time</th><td><%= data.Pulse1_Time || "" %></td>
         <th>Corrective Lenses</th><td><%= data.Corrective_Lenses || "" %></td>
+        <th>Able to follow stimulus</th><td><%= data.Follow_Stimulus || "" %></td>
       </tr>
       <tr>
-        <th>Eyes Blindness</th><td><%= data.Eyes_Blindness || "" %></td>
+        <th>Eyes</th><td><%= data.Eyes_Observed_Display || listText(data.Eyes_Observed) %></td>
+        <th>Blindness</th><td><%= data.Blindness_Affected_Display || listText(data.Blindness_Affected) %></td>
         <th>Tracking</th><td><%= data.Tracking || "" %></td>
-        <th>Follow Stimulus</th><td><%= data.Follow_Stimulus || "" %></td>
-      </tr>
-      <tr>
-        <th>Pupil size (explain)</th><td colspan="3"><%= data.Pupil_Explain || "" %></td>
-        <th>Eyelids</th><td><%= data.Eyelids || "" %></td>
       </tr>
       <tr>
         <th>Resting Nystagmus</th><td><%= data.Resting_Nyst || "" %></td>
         <th>Vertical Nystagmus</th><td><%= data.Vertical_Nyst || "" %></td>
-        <th>First Pulse / Time</th><td><%= data.Pulse1 || "" %></td>
+        <th>Eyelids</th><td><%= data.Eyelids || "" %></td>
+      </tr>
+      <tr>
+        <th>Pupil size / notes</th><td colspan="5"><%= data.Pupil_Explain || "" %></td>
       </tr>
       <tr>
         <th>Preliminary Exam Notes</th><td colspan="5"><%= data.Prelim_Notes || "" %></td>
@@ -139,17 +152,26 @@
   <div class="section">HGN / VGN / Convergence</div>
   <table class="table">
     <tr>
-      <th>HGN Left Eye</th><td><%= data.HGN_Left || data.HGN || "" %></td>
-      <th>HGN Right Eye</th><td><%= data.HGN_Right || data.HGN || "" %></td>
-      <th>VGN</th><td><%= data.VGN || "" %></td>
+      <th></th>
+      <th>Lack of Smooth Pursuit</th>
+      <th>Distinct &amp; Sustained at Max Deviation</th>
+      <th>Angle of Onset</th>
     </tr>
     <tr>
-      <th>Lack of Smooth Pursuit</th><td><%= data.HGN_LSP || "" %></td>
-      <th>Maximum Deviation</th><td><%= data.HGN_MD || "" %></td>
-      <th>Angle of Onset</th><td><%= data.HGN_AOO || "" %></td>
+      <th>Left Eye</th>
+      <td><%= data.HGN_Left_LSP || "" %></td>
+      <td><%= data.HGN_Left_MD || "" %></td>
+      <td><%= data.HGN_Left_AOO || "" %></td>
     </tr>
     <tr>
-      <th>Lack of Convergence</th><td colspan="5"><%= data.LOC || "" %></td>
+      <th>Right Eye</th>
+      <td><%= data.HGN_Right_LSP || "" %></td>
+      <td><%= data.HGN_Right_MD || "" %></td>
+      <td><%= data.HGN_Right_AOO || "" %></td>
+    </tr>
+    <tr>
+      <th>Vertical Gaze Nystagmus</th><td><%= data.VGN || "" %></td>
+      <th>Lack of Convergence</th><td><%= data.LOC || "" %></td>
     </tr>
   </table>
 

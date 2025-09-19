@@ -44,6 +44,10 @@
     .inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
     .inline input[type="text"],
     .inline select{min-width:180px}
+    .hidden{display:none !important}
+    .group table{width:100%;border-collapse:collapse;margin-top:8px}
+    .group table th,.group table td{border:1px solid var(--line);padding:6px;font-size:13px;text-align:left}
+    .group table select{width:100%;padding:6px;font-size:13px}
 
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
     button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 12px;font-weight:600;cursor:pointer}
@@ -114,17 +118,19 @@
       ["Drinking_When","text","When have you been drinking?"],
       ["Drinking_HowMuch","text","How much have you had?"],
       ["Drinking_LastTime","text","Time of last drink"],
-      ["Time_Now","text","Time now — Actual"],
-      ["Sleep","text","When did you last sleep? How long?","span-2"]
+      ["Time_Now_Subjective","text","Time now (stated)"],
+      ["Time_Now_Actual","text","Actual current time"],
+      ["Sleep_Last","text","When did you last sleep?"],
+      ["Sleep_Length","text","How long did you sleep?"],
     ]],
 
     ["Medical / Physical","medical",[
-      ["Sick_Injured","text","Are you sick or injured?"],
-      ["Diabetic_Epileptic","text","Are you diabetic or epileptic?"],
-      ["Insulin","text","Do you take insulin?"],
-      ["Physical_Defects","text","Any physical defects?"],
-      ["Under_Doctor","text","Under the care of a doctor or dentist?"],
-      ["Medication_Drugs","text","Taking any medication or drugs?"]
+      ["Sick_Injured","yesNoNotes","Are you sick or injured?"],
+      ["Diabetic_Epileptic","yesNoNotes","Are you diabetic or epileptic?"],
+      ["Insulin","yesNo","Do you take insulin?"],
+      ["Physical_Defects","yesNoNotes","Any physical defects?"],
+      ["Under_Doctor","yesNoNotes","Under the care of a doctor or dentist?"],
+      ["Medication_Drugs","yesNoNotes","Taking any medication or drugs?"],
     ]],
 
     ["Preliminary Exam","prelim",[
@@ -133,25 +139,23 @@
       ["Speech","text","Speech"],
       ["Breath_Odor","text","Breath Odor"],
       ["Face","text","Face"],
-      ["Pulse1","text","First Pulse / Time"],
-      ["Corrective_Lenses","text","Corrective Lenses"],
-      ["Eyes_Blindness","text","Eyes Blindness"],
-      ["Tracking","text","Tracking"],
-      ["Pupil_Explain","text","Pupil size (explain)","span-2"],
-      ["Resting_Nyst","text","Resting Nystagmus"],
-      ["Vertical_Nyst","text","Vertical Nystagmus"],
-      ["Follow_Stimulus","text","Able to follow stimulus"],
-      ["Eyelids","text","Eyelids"],
+      ["Pulse1_Rate","text","First Pulse"],
+      ["Pulse1_Time","text","First Pulse Time"],
+      ["Corrective_Lenses_Group","correctiveLenses","Corrective Lenses","span-3"],
+      ["Eyes_Observed","checkboxList","Eyes",["Normal","Watery","Bloodshot"]],
+      ["Blindness_Affected","checkboxList","Blindness",["None","Left","Right"],{exclusive:"None"}],
+      ["Tracking","radioOptions","Tracking",["Equal","Unequal"]],
+      ["Pupil_Status","pupilStatus","Pupil size / notes","span-3"],
+      ["Resting_Nyst","yesNo","Resting Nystagmus"],
+      ["Vertical_Nyst","yesNo","Vertical Nystagmus"],
+      ["Follow_Stimulus","yesNo","Able to follow stimulus"],
+      ["Eyelids","radioOptions","Eyelids",["Normal","Droopy"]],
       ["Prelim_Notes","text","Preliminary Exam Notes","span-3"]
     ]],
 
     ["HGN / VGN / Convergence","hgn",[
-      ["HGN_Left","text","HGN Left Eye"],
-      ["HGN_Right","text","HGN Right Eye"],
-      ["VGN","text","VGN (present/absent)"],
-      ["HGN_LSP","text","Lack of Smooth Pursuit"],
-      ["HGN_MD","text","Maximum Deviation"],
-      ["HGN_AOO","text","Angle of Onset"],
+      ["HGN_Findings","hgnClues","Horizontal Gaze Nystagmus Findings","span-3"],
+      ["VGN","yesNo","Vertical Gaze Nystagmus Present?"],
       ["LOC","text","Lack of Convergence","span-3"]
     ]],
 
@@ -294,16 +298,20 @@
       grid.className = fields.length <= 2 ? "grid one" : (fields.length <= 6 ? "grid two" : "grid");
 
       for (const f of fields){
-        const [name, type, label, extra] = f;
+        const name = f[0];
+        const type = f[1];
+        const label = f[2];
+        const extras = f.slice(3);
+        const spanClass = extras.find(val => typeof val === "string" && val.startsWith("span-"));
         const wrap = document.createElement("div");
-        if (extra && typeof extra === "string" && extra.startsWith("span-")) wrap.classList.add(extra);
+        if (spanClass) wrap.classList.add(spanClass);
 
         if (type === "subheading"){
           wrap.classList.add("span-3");
           wrap.innerHTML = `<div class="subheading">${label}</div>`;
 
         } else if (type === "select"){
-          const opts = f[3] || [];
+          const opts = extras.find(Array.isArray) || [];
           wrap.innerHTML = `<label>${label}
             <select name="${name}" id="${name}">
               ${opts
@@ -368,6 +376,149 @@
               </div>
             </div>`;
 
+        } else if (type === "yesNoNotes"){
+          wrap.innerHTML = `
+            <div class="group yes-no-notes" data-field="${name}">
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                <label><input type="radio" name="${name}_Answer" value="Yes"> Yes</label>
+                <label><input type="radio" name="${name}_Answer" value="No"> No</label>
+                <input type="text" class="notes hidden" name="${name}_Notes" id="${name}_Notes" placeholder="Notes (if yes)">
+              </div>
+            </div>`;
+
+        } else if (type === "yesNo"){
+          wrap.innerHTML = `
+            <div class="group yes-no" data-field="${name}">
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                <label><input type="radio" name="${name}" value="Yes"> Yes</label>
+                <label><input type="radio" name="${name}" value="No"> No</label>
+              </div>
+            </div>`;
+
+        } else if (type === "checkboxList"){
+          const options = extras.find(Array.isArray) || [];
+          const config = extras.find(val => val && typeof val === "object" && !Array.isArray(val)) || {};
+          const exclusive = config.exclusive ? ` data-exclusive="${config.exclusive}"` : "";
+          wrap.innerHTML = `
+            <div class="group checkbox-list" data-field="${name}"${exclusive}>
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                ${options
+                  .map((opt, idx) => `<label><input type="checkbox" name="${name}" value="${opt}" data-collect="list"> ${opt}</label>`)
+                  .join("")}
+              </div>
+            </div>`;
+
+        } else if (type === "radioOptions"){
+          const options = extras.find(Array.isArray) || [];
+          wrap.innerHTML = `
+            <div class="group radio-options" data-field="${name}">
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                ${options
+                  .map(opt => `<label><input type="radio" name="${name}" value="${opt}"> ${opt}</label>`)
+                  .join("")}
+              </div>
+            </div>`;
+
+        } else if (type === "pupilStatus"){
+          wrap.innerHTML = `
+            <div class="group pupil-status" data-field="${name}">
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                <label><input type="radio" name="Pupil_Balance" value="Equal"> Equal</label>
+                <label><input type="radio" name="Pupil_Balance" value="Unequal"> Unequal</label>
+                <input type="text" class="notes hidden" name="Pupil_Notes" id="Pupil_Notes" placeholder="Notes">
+              </div>
+            </div>`;
+
+        } else if (type === "correctiveLenses"){
+          wrap.innerHTML = `
+            <div class="group corrective-lenses">
+              <div class="group-title">${label}</div>
+              <div class="inline">
+                <label><input type="checkbox" name="Corrective_Lenses_None" value="true" data-exclusive="true"> None</label>
+                <label><input type="checkbox" name="Corrective_Lenses_Glasses" value="true"> Glasses</label>
+                <label><input type="checkbox" name="Corrective_Lenses_Contacts" value="true" data-toggle="contacts"> Contacts</label>
+                <div class="inline contact-type hidden">
+                  <label><input type="radio" name="Corrective_Lenses_ContactsType" value="Hard"> Hard</label>
+                  <label><input type="radio" name="Corrective_Lenses_ContactsType" value="Soft"> Soft</label>
+                </div>
+              </div>
+            </div>`;
+
+        } else if (type === "hgnClues"){
+          wrap.classList.add("span-3");
+          wrap.innerHTML = `
+            <div class="group hgn-clues">
+              <div class="group-title">${label}</div>
+              <table>
+                <thead>
+                  <tr><th></th><th>Lack of Smooth Pursuit</th><th>Distinct &amp; Sustained at Max Deviation</th><th>Angle of Onset</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>Left Eye</th>
+                    <td>
+                      <select name="HGN_Left_LSP">
+                        <option value="">Select</option>
+                        <option value="Present">Present</option>
+                        <option value="None">None</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select name="HGN_Left_MD">
+                        <option value="">Select</option>
+                        <option value="Present">Present</option>
+                        <option value="None">None</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select name="HGN_Left_AOO">
+                        <option value="">Select</option>
+                        <option value="None">None</option>
+                        <option value="Immediate">Immediate</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                      </select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Right Eye</th>
+                    <td>
+                      <select name="HGN_Right_LSP">
+                        <option value="">Select</option>
+                        <option value="Present">Present</option>
+                        <option value="None">None</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select name="HGN_Right_MD">
+                        <option value="">Select</option>
+                        <option value="Present">Present</option>
+                        <option value="None">None</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select name="HGN_Right_AOO">
+                        <option value="">Select</option>
+                        <option value="None">None</option>
+                        <option value="Immediate">Immediate</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                        <option value="40">40</option>
+                        <option value="45">45</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>`;
+
         } else if (type === "textarea"){
           wrap.innerHTML = `<label>${label}<textarea name="${name}" id="${name}"></textarea></label>`;
 
@@ -396,6 +547,7 @@
     });
 
     setupComputedListeners();
+    setupConditionalControls();
   }
 
   // ---------- Data helpers ----------
@@ -446,14 +598,135 @@
     updateComputedAge();
   }
 
+  function applyYesNoNotes(container, clear){
+    const notes = container.querySelector('.notes');
+    if (!notes) return;
+    const checked = container.querySelector('input[type="radio"]:checked');
+    const hasNotes = notes.value && notes.value.trim().length > 0;
+    const show = (checked && checked.value === 'Yes') || hasNotes;
+    notes.classList.toggle('hidden', !show);
+    if (!show && clear){
+      notes.value = '';
+    }
+  }
+
+  function applyPupilStatus(container, clear){
+    const notes = container.querySelector('.notes');
+    if (!notes) return;
+    const checked = container.querySelector('input[type="radio"]:checked');
+    const hasNotes = notes.value && notes.value.trim().length > 0;
+    const show = (checked && checked.value === 'Unequal') || hasNotes;
+    notes.classList.toggle('hidden', !show);
+    if (!show && clear){
+      notes.value = '';
+    }
+  }
+
+  function enforceExclusive(container){
+    const exclusiveValue = container.getAttribute('data-exclusive');
+    if (!exclusiveValue) return;
+    const boxes = Array.from(container.querySelectorAll('input[type="checkbox"]'));
+    const exclusiveBox = boxes.find(cb => cb.value === exclusiveValue);
+    if (!exclusiveBox) return;
+    if (exclusiveBox.checked){
+      boxes.forEach(cb => { if (cb !== exclusiveBox) cb.checked = false; });
+    } else if (boxes.some(cb => cb !== exclusiveBox && cb.checked)){
+      exclusiveBox.checked = false;
+    }
+  }
+
+  function applyCorrectiveLensState(wrap, clear){
+    if (!wrap) return;
+    const contactCheckbox = wrap.querySelector('input[name="Corrective_Lenses_Contacts"]');
+    const contactType = wrap.querySelector('.contact-type');
+    const typeRadios = wrap.querySelectorAll('input[name="Corrective_Lenses_ContactsType"]');
+    const hasTypeSelection = Array.from(typeRadios).some(r => r.checked);
+    const show = (contactCheckbox && contactCheckbox.checked) || hasTypeSelection;
+    if (contactType){
+      contactType.classList.toggle('hidden', !show);
+      if (!show && clear){
+        typeRadios.forEach(r => { r.checked = false; });
+      }
+    }
+  }
+
+  function setupConditionalControls(){
+    formEl.querySelectorAll('.yes-no-notes').forEach(container => {
+      container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', () => applyYesNoNotes(container, true));
+      });
+    });
+
+    formEl.querySelectorAll('.checkbox-list[data-exclusive]').forEach(container => {
+      const boxes = container.querySelectorAll('input[type="checkbox"]');
+      boxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+          enforceExclusive(container);
+        });
+      });
+    });
+
+    const corrective = formEl.querySelector('.corrective-lenses');
+    if (corrective){
+      const noneBox = corrective.querySelector('input[data-exclusive]');
+      const contactBox = corrective.querySelector('input[name="Corrective_Lenses_Contacts"]');
+      const boxes = corrective.querySelectorAll('input[type="checkbox"]');
+      boxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+          if (noneBox && cb === noneBox && cb.checked){
+            boxes.forEach(other => { if (other !== cb) other.checked = false; });
+            applyCorrectiveLensState(corrective, true);
+            return;
+          }
+          if (noneBox && cb !== noneBox && cb.checked){
+            noneBox.checked = false;
+          }
+          if (contactBox && cb === contactBox){
+            applyCorrectiveLensState(corrective, !contactBox.checked);
+          }
+        });
+      });
+    }
+
+    formEl.querySelectorAll('.pupil-status').forEach(container => {
+      container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', () => applyPupilStatus(container, false));
+      });
+    });
+
+    refreshConditionalFields();
+  }
+
+  function refreshConditionalFields(){
+    formEl.querySelectorAll('.yes-no-notes').forEach(container => applyYesNoNotes(container, false));
+    formEl.querySelectorAll('.checkbox-list[data-exclusive]').forEach(container => enforceExclusive(container));
+    applyCorrectiveLensState(formEl.querySelector('.corrective-lenses'), false);
+    formEl.querySelectorAll('.pupil-status').forEach(container => applyPupilStatus(container, false));
+  }
+
   function dataFromForm(){
     updateComputedAge();
     const data = {};
-    formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
-      .forEach(el => { if (el.name) data[el.name] = el.value; });
+    const listValues = {};
+    formEl.querySelectorAll("input,textarea,select").forEach(el => {
+      if (!el.name) return;
+      if (el.type === "radio"){
+        if (el.checked) data[el.name] = el.value;
+      } else if (el.type === "checkbox"){
+        if (el.dataset.collect === "list"){
+          if (!listValues[el.name]) listValues[el.name] = [];
+          if (el.checked) listValues[el.name].push(el.value);
+        } else if (el.checked){
+          data[el.name] = true;
+        }
+      } else {
+        data[el.name] = el.value;
+      }
+    });
 
-    const m = formEl.querySelector('input[name="Miranda"]:checked');
-    if (m) data.Miranda = m.value;
+    Object.entries(listValues).forEach(([key, values]) => {
+      if (values.length) data[key] = values;
+    });
 
     let crashValue = "";
     CRASH_OPTIONS.forEach(({ field, label }) => {
@@ -474,6 +747,79 @@
       }
     });
     if (chemicalSelections.length) data.Chemical_Test = chemicalSelections.join(", ");
+
+    const yesNoNoteFields = [
+      "Sick_Injured",
+      "Diabetic_Epileptic",
+      "Physical_Defects",
+      "Under_Doctor",
+      "Medication_Drugs"
+    ];
+    yesNoNoteFields.forEach(name => {
+      const answer = data[`${name}_Answer`];
+      const notes = data[`${name}_Notes`];
+      if (answer){
+        data[name] = answer === "Yes" && notes ? `Yes — ${notes}` : answer;
+      }
+    });
+
+    const eyesSelections = Array.isArray(data.Eyes_Observed) ? data.Eyes_Observed : [];
+    if (eyesSelections.length) data.Eyes_Observed_Display = eyesSelections.join(", ");
+
+    const blindnessSelections = Array.isArray(data.Blindness_Affected) ? data.Blindness_Affected : [];
+    if (blindnessSelections.length) data.Blindness_Affected_Display = blindnessSelections.join(", ");
+
+    const lensParts = [];
+    if (data.Corrective_Lenses_None) lensParts.push("None");
+    if (data.Corrective_Lenses_Glasses) lensParts.push("Glasses");
+    if (data.Corrective_Lenses_Contacts){
+      const type = data.Corrective_Lenses_ContactsType;
+      lensParts.push(type ? `Contacts (${type})` : "Contacts");
+    }
+    if (lensParts.length) data.Corrective_Lenses = lensParts.join(", ");
+
+    if (data.Pulse1_Rate || data.Pulse1_Time){
+      data.Pulse1 = [data.Pulse1_Rate, data.Pulse1_Time].filter(Boolean).join(" @ ");
+    }
+
+    const pupilBalance = data.Pupil_Balance || "";
+    const pupilNotes = data.Pupil_Notes || "";
+    if (pupilBalance || pupilNotes){
+      data.Pupil_Explain = [pupilBalance, pupilNotes].filter(Boolean).join(" — ");
+    }
+
+    const buildEyeSummary = side => {
+      const parts = [];
+      const lsp = data[`HGN_${side}_LSP`];
+      const md = data[`HGN_${side}_MD`];
+      const aoo = data[`HGN_${side}_AOO`];
+      if (lsp) parts.push(`LSP: ${lsp}`);
+      if (md) parts.push(`Max Dev: ${md}`);
+      if (aoo) parts.push(`Angle: ${aoo}`);
+      return parts.join("; ");
+    };
+    const leftSummary = buildEyeSummary("Left");
+    const rightSummary = buildEyeSummary("Right");
+    if (leftSummary) data.HGN_Left = leftSummary;
+    if (rightSummary) data.HGN_Right = rightSummary;
+    if (data.HGN_Left_LSP || data.HGN_Right_LSP){
+      data.HGN_LSP = [
+        data.HGN_Left_LSP ? `L: ${data.HGN_Left_LSP}` : "",
+        data.HGN_Right_LSP ? `R: ${data.HGN_Right_LSP}` : ""
+      ].filter(Boolean).join(" / ");
+    }
+    if (data.HGN_Left_MD || data.HGN_Right_MD){
+      data.HGN_MD = [
+        data.HGN_Left_MD ? `L: ${data.HGN_Left_MD}` : "",
+        data.HGN_Right_MD ? `R: ${data.HGN_Right_MD}` : ""
+      ].filter(Boolean).join(" / ");
+    }
+    if (data.HGN_Left_AOO || data.HGN_Right_AOO){
+      data.HGN_AOO = [
+        data.HGN_Left_AOO ? `L: ${data.HGN_Left_AOO}` : "",
+        data.HGN_Right_AOO ? `R: ${data.HGN_Right_AOO}` : ""
+      ].filter(Boolean).join(" / ");
+    }
 
     const drinkingSummary = [];
     if (data.Drinking_When) drinkingSummary.push(`When: ${data.Drinking_When}`);
@@ -521,15 +867,78 @@
     r.onload = () => {
       try{
         const data = JSON.parse(r.result);
-        formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
-          .forEach(el => { if (el.name && data[el.name] !== undefined) el.value = data[el.name]; });
+        formEl.querySelectorAll('input,textarea,select').forEach(el => {
+          if (!el.name) return;
+          const value = data[el.name];
+          if (el.type === 'radio'){
+            el.checked = value !== undefined && value === el.value;
+          } else if (el.type === 'checkbox'){
+            if (el.dataset.collect === 'list'){
+              const raw = data[el.name] !== undefined ? data[el.name] : data[`${el.name}_Display`];
+              let values = [];
+              if (Array.isArray(raw)) values = raw.map(String);
+              else if (typeof raw === 'string') values = raw.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+              el.checked = values.includes(el.value);
+            } else {
+              el.checked = !!value;
+            }
+          } else if (value !== undefined){
+            el.value = value;
+          } else {
+            el.value = '';
+          }
+        });
+
+        const yesNoNoteFields = [
+          "Sick_Injured",
+          "Diabetic_Epileptic",
+          "Physical_Defects",
+          "Under_Doctor",
+          "Medication_Drugs"
+        ];
+        yesNoNoteFields.forEach(name => {
+          let answer = data[`${name}_Answer`];
+          let notes = data[`${name}_Notes`];
+          if (!answer && typeof data[name] === 'string'){
+            const raw = data[name];
+            const lower = raw.toLowerCase();
+            if (lower.startsWith('yes')){
+              answer = 'Yes';
+              if (!notes){
+                const dashIdx = raw.indexOf('—');
+                const colonIdx = raw.indexOf(':');
+                const sepIdx = dashIdx >= 0 ? dashIdx : colonIdx;
+                if (sepIdx >= 0) notes = raw.slice(sepIdx + 1).trim();
+              }
+            } else if (lower.startsWith('no')){
+              answer = 'No';
+            }
+          }
+          if (answer){
+            const radio = formEl.querySelector(`input[name="${name}_Answer"][value="${answer}"]`);
+            if (radio) radio.checked = true;
+          }
+          if (notes){
+            const notesInput = formEl.querySelector(`#${name}_Notes`);
+            if (notesInput) notesInput.value = notes;
+          }
+        });
+
         if (data.Drinking && !data.Drinking_When && !data.Drinking_HowMuch && !data.Drinking_LastTime){
           const drinkWhen = formEl.querySelector('#Drinking_When');
           if (drinkWhen) drinkWhen.value = data.Drinking;
         }
-        const rb = formEl.querySelector(`input[name="Miranda"][value="${data.Miranda}"]`);
-        if (rb) rb.checked = true;
-        if (data.Miranda_Notes) document.getElementById("Miranda_Notes").value = data.Miranda_Notes;
+
+        if (!data.Pulse1_Rate && typeof data.Pulse1 === 'string'){
+          const parts = data.Pulse1.split('@');
+          const rate = parts[0] ? parts[0].trim() : '';
+          const time = parts[1] ? parts[1].trim() : '';
+          const rateInput = formEl.querySelector('input[name="Pulse1_Rate"]');
+          const timeInput = formEl.querySelector('input[name="Pulse1_Time"]');
+          if (rateInput && rate) rateInput.value = rate;
+          if (timeInput && time) timeInput.value = time;
+        }
+
         const crashLabel = (data.Crash || "").toLowerCase();
         CRASH_OPTIONS.forEach(({ field, label }) => {
           const el = formEl.querySelector(`input[name="${field}"]`);
@@ -552,6 +961,8 @@
             el.checked = !!(data[field] || matchFromString);
           }
         });
+
+        refreshConditionalFields();
         updateComputedAge();
       }catch{ alert("Invalid JSON");}
     };
@@ -565,6 +976,7 @@
     });
     document.getElementById("narrative").textContent = "";
     updateComputedAge();
+    refreshConditionalFields();
   };
 
   // init
