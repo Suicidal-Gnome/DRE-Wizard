@@ -5,264 +5,286 @@
 <title>DRE Face Sheet & Narrative</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
-  @page { size: Letter; margin: 10mm; }
-  * { box-sizing: border-box }
-  body { font-family: Arial, Helvetica, sans-serif; color:#111; margin:0 }
-  .sheet { page-break-after: always; padding: 0 }
-  .title { text-align:center; font-weight:700; font-size:16px; margin:0 0 6px }
-  .subtitle { text-align:center; color:#4b5563; font-size:11px; margin:0 0 6px }
-  .section { font-weight:700; color:#0b3e7a; margin:10px 0 6px }
-  .kv { display:grid; grid-template-columns: 170px 1fr; gap:6px 10px; align-items:center; margin-bottom:6px }
-  .k { font-weight:700; color:#0b3e7a; font-size:12px }
-  .v { border-bottom:1px solid #cfd8ea; min-height:18px; padding:1px 0; font-size:12px }
-  .grid-3 { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px 12px }
-  .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:6px 12px }
-  .box { border:1px solid #cfd8ea; border-radius:6px; padding:8px; margin-top:8px }
-  .foot { text-align:right; font-size:10px; color:#6b7280; margin-top:6px }
-  .narr { white-space:pre-wrap; line-height:1.35; font-size:12px }
-  .table { width:100%; border-collapse:collapse; font-size:12px; margin-top:4px }
-  .table th,.table td { border:1px solid #cfd8ea; padding:4px 6px; vertical-align:top }
-  .chk { display:inline-block; width:10px; height:10px; border:1px solid #6b7280; margin-right:6px; vertical-align:middle }
-  .fill { width:100%; height:100%; background:#111 }
+  @page { size: Letter; margin: 12mm; }
+  * { box-sizing: border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; margin:0; color:#111; }
+  .sheet { page-break-after: always; padding:0; }
+  .title { text-align:center; font-weight:700; font-size:16px; margin:0 0 6px; }
+  .subtitle { text-align:center; color:#4b5563; font-size:11px; margin:0 0 10px; }
+  .section { font-weight:700; color:#0c2e63; margin:12px 0 6px; text-transform:uppercase; font-size:12px; }
+  .grid { display:grid; grid-template-columns: repeat(3,1fr); gap:6px 12px; }
+  .grid.two { grid-template-columns: repeat(2,1fr); }
+  .grid.one { grid-template-columns: 1fr; }
+  .kv { display:grid; grid-template-columns: 150px 1fr; gap:4px 8px; font-size:12px; align-items:center; }
+  .kv .k { font-weight:700; color:#0c2e63; }
+  .kv .v { border-bottom:1px solid #cfd8ea; min-height:16px; padding:2px 0; }
+  table.matrix { width:100%; border-collapse:collapse; font-size:12px; margin-top:4px; }
+  table.matrix th, table.matrix td { border:1px solid #cfd8ea; padding:5px 6px; vertical-align:top; }
+  table.matrix th { background:#edf2fc; color:#0c2e63; }
+  .notes { font-size:11px; color:#4b5563; }
+  .narr { white-space:pre-wrap; line-height:1.4; font-size:12px; }
+  .checkbox-cell { display:flex; align-items:center; gap:6px; }
+  .box { border:1px solid #cfd8ea; border-radius:6px; padding:8px; margin-top:4px; }
+  .pill { display:inline-flex; align-items:center; gap:4px; padding:2px 6px; border:1px solid #cfd8ea; border-radius:999px; margin:2px; font-size:11px; }
+  .foot { text-align:right; font-size:10px; color:#6b7280; margin-top:6px; }
 </style>
 </head>
 <body>
 
-<!-- ===================== FACE SHEET — PAGE 1 ===================== -->
-<div class="sheet">
-  <div class="title">TEXAS DRUG INFLUENCE EVALUATION — FACE SHEET</div>
-  <div class="subtitle">Page 1 — Case/Evaluator · Subject · Interview · Medical/Physical · Preliminary Exam</div>
+<% function fmt(val){ return val || ""; } %>
+<% function fmtList(list){ if(Array.isArray(list)) return list.join(', '); if(typeof list === 'string') return list; return ''; } %>
 
-  <!-- Case / Evaluator -->
+<div class="sheet">
+  <div class="title">DRUG INFLUENCE EVALUATION — FACE SHEET</div>
+  <div class="subtitle">Page 1 · Case · Subject · Interview · Medical · Preliminary Exam</div>
+
   <div class="section">Case / Evaluator</div>
-  <div class="grid-3">
-    <div class="kv"><div class="k">Evaluator</div><div class="v"><%= data.Evaluator || "" %></div></div>
-    <div class="kv"><div class="k">DRE #</div><div class="v"><%= data.DRE_Number || "" %></div></div>
-    <div class="kv"><div class="k">Rolling Log #</div><div class="v"><%= data.Rolling_Log_Number || "" %></div></div>
-
-    <div class="kv"><div class="k">Case #</div><div class="v"><%= data.Case_Number || "" %></div></div>
-    <div class="kv"><div class="k">Incident #</div><div class="v"><%= data.Incident_Number || "" %></div></div>
-    <div class="kv"><div class="k">Recorder / Witnesses</div><div class="v"><%= data.Recorder || "" %></div></div>
-
-    <div class="kv"><div class="k">Arresting Officer</div><div class="v"><%= data.Arresting_Officer || "" %></div></div>
-    <div class="kv"><div class="k">Officer’s Agency</div><div class="v"><%= data.Arresting_Agency || "" %></div></div>
-    <div class="kv"><div class="k">Crash</div><div class="v"><%= data.Crash || "" %></div></div>
-
-    <div class="kv"><div class="k">Location</div><div class="v"><%= data.Location || "" %></div></div>
-    <div class="kv"><div class="k">Chemical Test</div><div class="v"><%= data.Chemical_Test || "" %></div></div>
-    <div class="kv"><div class="k">Miranda Warning Given</div><div class="v"><%= data.Miranda || "" %></div></div>
-
-    <div class="kv"><div class="k">Date Examined</div><div class="v"><%= data.Eval_Date || "" %></div></div>
-    <div class="kv"><div class="k">Time Examined</div><div class="v"><%= data.Eval_Time || "" %></div></div>
-    <div></div>
+  <div class="grid">
+    <div class="kv"><div class="k">Evaluator</div><div class="v"><%= fmt(data.Evaluator) %></div></div>
+    <div class="kv"><div class="k">DRE #</div><div class="v"><%= fmt(data.DRE_Number) %></div></div>
+    <div class="kv"><div class="k">Rolling Log #</div><div class="v"><%= fmt(data.Rolling_Log_Number) %></div></div>
+    <div class="kv"><div class="k">Case #</div><div class="v"><%= fmt(data.Case_Number) %></div></div>
+    <div class="kv"><div class="k">Incident #</div><div class="v"><%= fmt(data.Incident_Number) %></div></div>
+    <div class="kv"><div class="k">Recorder / Witnesses</div><div class="v"><%= fmt(data.Witnesses) %></div></div>
+    <div class="kv"><div class="k">Arresting Officer</div><div class="v"><%= fmt(data.Arresting_Officer) %></div></div>
+    <div class="kv"><div class="k">Officer's Agency</div><div class="v"><%= fmt(data.Arresting_Agency) %></div></div>
+    <div class="kv"><div class="k">Date Examined</div><div class="v"><%= fmt(data.Eval_Date) %></div></div>
+    <div class="kv"><div class="k">Time Examined</div><div class="v"><%= fmt(data.Eval_Time) %></div></div>
+    <div class="kv"><div class="k">Location</div><div class="v"><%= [data.Eval_Location, [data.Location_County, data.Location_State].filter(Boolean).join(', ')].filter(Boolean).join(', ') %></div></div>
+  </div>
+  <div class="grid two" style="margin-top:6px">
+    <div class="kv"><div class="k">Miranda Warning</div><div class="v"><%= data.Miranda === 'Yes' ? `Yes — ${fmt(data.Miranda_Given_By)}` : fmt(data.Miranda) %></div></div>
+    <div class="kv"><div class="k">Crash</div><div class="v"><%= fmt(data.Crash) %></div></div>
+    <div class="kv"><div class="k">Chemical Test</div><div class="v"><%= fmt(data.Chemical_Test) %></div></div>
   </div>
 
-  <!-- Subject -->
   <div class="section">Subject</div>
-  <div class="grid-3">
-    <div class="kv"><div class="k">Arrestee’s Name (Last, First, MI)</div><div class="v"><%= data.Subject_Name || "" %></div></div>
-    <div class="kv"><div class="k">DOB</div><div class="v"><%= data.Subject_DOB || "" %></div></div>
-    <div class="kv"><div class="k">Age</div><div class="v"><%= data.Subject_Age || "" %></div></div>
-
-    <div class="kv"><div class="k">Sex</div><div class="v"><%= data.Subject_Gender || "" %></div></div>
-    <div class="kv"><div class="k">Race</div><div class="v"><%= data.Subject_Race || "" %></div></div>
-    <div class="kv"><div class="k">Breath Test</div><div class="v"><%= data.Breath_Result || "" %></div></div>
+  <div class="grid">
+    <div class="kv"><div class="k">Name</div><div class="v"><%= fmt(data.Subject_Name) %></div></div>
+    <div class="kv"><div class="k">DOB</div><div class="v"><%= fmt(data.Subject_DOB) %></div></div>
+    <div class="kv"><div class="k">Age</div><div class="v"><%= fmt(data.Subject_Age) %></div></div>
+    <div class="kv"><div class="k">Sex</div><div class="v"><%= fmt(data.Subject_Gender) %></div></div>
+    <div class="kv"><div class="k">Race</div><div class="v"><%= fmt(data.Subject_Race) %></div></div>
+    <div class="kv"><div class="k">Breath Test</div><div class="v"><%= data.Breath_Refused ? 'Refused' : fmt(data.Breath_Result) %></div></div>
+    <div class="kv"><div class="k">Instrument #</div><div class="v"><%= fmt(data.Breath_Instrument) %></div></div>
   </div>
 
-  <!-- Interview -->
-  <div class="box">
-    <div class="section">Interview</div>
-    <div class="grid-2">
-      <div class="kv"><div class="k">What have you eaten today? When?</div><div class="v"><%= data.Food_When || "" %></div></div>
-      <div class="kv"><div class="k">What have you been drinking? How much? Time of last drink?</div><div class="v"><%= data.Drinking || "" %></div></div>
-      <div class="kv"><div class="k">Time now — Actual</div><div class="v"><%= data.Time_Now || "" %></div></div>
-      <div class="kv"><div class="k">When did you last sleep? How long?</div><div class="v"><%= data.Sleep || "" %></div></div>
-    </div>
+  <div class="section">Interview</div>
+  <div class="grid two">
+    <div class="kv"><div class="k">Food</div><div class="v"><%= [data.What_Eaten, data.When_Eaten].filter(Boolean).join(' — ') %></div></div>
+    <div class="kv"><div class="k">Alcohol</div><div class="v"><%= [data.What_Drinking, data.When_Drinking, data.Last_Drink].filter(Boolean).join(' / ') %></div></div>
+    <div class="kv"><div class="k">Time now (stated)</div><div class="v"><%= fmt(data.Time_Now) %></div></div>
+    <div class="kv"><div class="k">Actual time</div><div class="v"><%= fmt(data.Time_Actual) %></div></div>
+    <div class="kv"><div class="k">Last sleep</div><div class="v"><%= [data.Last_Slept, data.Sleep_Amount].filter(Boolean).join(' — ') %></div></div>
   </div>
 
-  <!-- Medical / Physical -->
-  <div class="box">
-    <div class="section">Medical / Physical</div>
-    <div class="grid-2">
-      <div class="kv"><div class="k">Sick or injured?</div><div class="v"><%= data.Sick_Injured || "" %></div></div>
-      <div class="kv"><div class="k">Diabetic or epileptic?</div><div class="v"><%= data.Diabetic_Epileptic || "" %></div></div>
-      <div class="kv"><div class="k">Take insulin?</div><div class="v"><%= data.Insulin || "" %></div></div>
-      <div class="kv"><div class="k">Physical defects?</div><div class="v"><%= data.Physical_Defects || "" %></div></div>
-      <div class="kv"><div class="k">Under doctor/dentist care?</div><div class="v"><%= data.Under_Doctor || "" %></div></div>
-      <div class="kv"><div class="k">Medication / drugs?</div><div class="v"><%= data.Medication_Drugs || "" %></div></div>
-    </div>
-  </div>
+  <div class="section">Medical / Physical</div>
+  <table class="matrix">
+    <tr><th>Prompt</th><th>Answer</th><th>Notes</th></tr>
+    <tr><td>Sick or injured</td><td><%= fmt(data.Sick_Injured) %></td><td><%= fmt(data.Sick_Notes) %></td></tr>
+    <tr><td>Diabetic or epileptic</td><td><%= fmt(data.Diabetic_Epileptic) %></td><td><%= fmt(data.Diabetic_Eplieptic_Notes) %></td></tr>
+    <tr><td>Takes insulin</td><td><%= fmt(data.Insulin) %></td><td></td></tr>
+    <tr><td>Physical defects</td><td><%= fmt(data.Defects) %></td><td><%= fmt(data.Defect_Notes) %></td></tr>
+    <tr><td>Under doctor/dentist care</td><td><%= fmt(data.Doctor) %></td><td><%= fmt(data.Doctor_Notes) %></td></tr>
+    <tr><td>Medications / drugs</td><td><%= fmt(data.Meds_Drugs) %></td><td><%= fmt(data.Meds_Drugs_Notes) %></td></tr>
+  </table>
 
-  <!-- Preliminary Exam -->
-  <div class="box">
-    <div class="section">Preliminary Exam</div>
-    <table class="table">
-      <tr>
-        <th>Attitude</th><td><%= data.Attitude || "" %></td>
-        <th>Coordination</th><td><%= data.Coordination || "" %></td>
-        <th>Speech</th><td><%= data.Speech || "" %></td>
-      </tr>
-      <tr>
-        <th>Breath Odor</th><td><%= data.Breath_Odor || "" %></td>
-        <th>Face</th><td><%= data.Face || "" %></td>
-        <th>Corrective Lenses</th><td><%= data.Corrective_Lenses || "" %></td>
-      </tr>
-      <tr>
-        <th>Eyes Blindness</th><td><%= data.Eyes_Blindness || "" %></td>
-        <th>Tracking</th><td><%= data.Tracking || "" %></td>
-        <th>Follow Stimulus</th><td><%= data.Follow_Stimulus || "" %></td>
-      </tr>
-      <tr>
-        <th>Pupil size (explain)</th><td colspan="3"><%= data.Pupil_Explain || "" %></td>
-        <th>Eyelids</th><td><%= data.Eyelids || "" %></td>
-      </tr>
-      <tr>
-        <th>Resting Nystagmus</th><td><%= data.Resting_Nyst || "" %></td>
-        <th>Vertical Nystagmus</th><td><%= data.Vertical_Nyst || "" %></td>
-        <th>First Pulse / Time</th><td><%= data.Pulse1 || "" %></td>
-      </tr>
-      <tr>
-        <th>Preliminary Exam Notes</th><td colspan="5"><%= data.Prelim_Notes || "" %></td>
-      </tr>
-    </table>
-  </div>
-
-  <div class="foot">Revised 02/2023 — Face Sheet Page 1</div>
+  <div class="section">Preliminary Exam</div>
+  <table class="matrix">
+    <tr>
+      <th>Attitude</th><td><%= fmt(data.Attitude) %></td>
+      <th>Coordination</th><td><%= fmt(data.Coordination) %></td>
+      <th>Speech</th><td><%= fmt(data.Speech) %></td>
+    </tr>
+    <tr>
+      <th>Breath Odor</th><td><%= fmt(data.Breath_Odor) %></td>
+      <th>Face</th><td><%= fmt(data.Face) %></td>
+      <th>First Pulse</th><td><%= fmt(data.Pulse1_Display || data.Pulse1) %></td>
+    </tr>
+    <tr>
+      <th>Corrective Lenses</th><td colspan="5"><%= fmt(data.Corrective_Lenses) %></td>
+    </tr>
+    <tr>
+      <th>Eyes</th><td><%= fmtList(data.Eyes) %></td>
+      <th>Blindness</th><td><%= fmtList(data.Blind) %></td>
+      <th>Tracking</th><td><%= fmt(data.Tracking) %></td>
+    </tr>
+    <tr>
+      <th>Pupil size</th><td><%= fmt(data.Pupil_Size) %></td>
+      <th>Pupil notes</th><td colspan="3"><%= fmt(data.Pupil_Size_Notes) %></td>
+    </tr>
+    <tr>
+      <th>Resting Nystagmus</th><td><%= fmt(data.Resting_Nystagmus) %></td>
+      <th>Vertical Nystagmus</th><td><%= fmt(data.Vertical_Nystagmus) %></td>
+      <th>Able to follow stimulus</th><td><%= fmt(data.Able_To_Follow) %></td>
+    </tr>
+    <tr>
+      <th>Eyelids</th><td><%= fmt(data.Eyelids) %></td>
+      <th colspan="4">Preliminary Notes</th>
+    </tr>
+    <tr>
+      <td colspan="6"><%= fmt(data.Prelim_Notes) %></td>
+    </tr>
+  </table>
+  <div class="foot">Face Sheet Page 1</div>
 </div>
 
-<!-- ===================== FACE SHEET — PAGE 2 ===================== -->
 <div class="sheet">
-  <div class="title">TEXAS DRUG INFLUENCE EVALUATION — FACE SHEET</div>
-  <div class="subtitle">Page 2 — HGN/VGN/Convergence · Psychophysical · Vitals/Pupils · Oral/Nasal · Drug Use · Timeline · Toxicology · Opinion</div>
+  <div class="title">DRUG INFLUENCE EVALUATION — FACE SHEET</div>
+  <div class="subtitle">Page 2 · HGN · Psychophysical Tests</div>
 
-  <!-- HGN / VGN / Convergence -->
   <div class="section">HGN / VGN / Convergence</div>
-  <table class="table">
-    <tr>
-      <th>HGN Left Eye</th><td><%= data.HGN_Left || data.HGN || "" %></td>
-      <th>HGN Right Eye</th><td><%= data.HGN_Right || data.HGN || "" %></td>
-      <th>VGN</th><td><%= data.VGN || "" %></td>
-    </tr>
-    <tr>
-      <th>Lack of Smooth Pursuit</th><td><%= data.HGN_LSP || "" %></td>
-      <th>Maximum Deviation</th><td><%= data.HGN_MD || "" %></td>
-      <th>Angle of Onset</th><td><%= data.HGN_AOO || "" %></td>
-    </tr>
-    <tr>
-      <th>Lack of Convergence</th><td colspan="5"><%= data.LOC || "" %></td>
-    </tr>
+  <table class="matrix">
+    <tr><th></th><th>Lack of Smooth Pursuit</th><th>Distinct &amp; Sustained at Max Deviation</th><th>Angle of Onset</th></tr>
+    <tr><th>Left Eye</th><td><%= fmt(data.HGN_Pursuit_L) %></td><td><%= fmt(data.HGN_Max_L) %></td><td><%= fmt(data.HGN_Angle_L) %></td></tr>
+    <tr><th>Right Eye</th><td><%= fmt(data.HGN_Pursuit_R) %></td><td><%= fmt(data.HGN_Max_R) %></td><td><%= fmt(data.HGN_Angle_R) %></td></tr>
+    <tr><th>Vertical Gaze Nystagmus</th><td colspan="1"><%= fmt(data.Vertical_Nyst) %></td><th>Lack of Convergence</th><td><%= fmt(data.LOC) %></td></tr>
   </table>
 
-  <!-- Psychophysical Tests -->
-  <div class="section">Psychophysical Tests</div>
-  <table class="table">
-    <tr><th>Modified Romberg Balance Test</th><td><%= data.Romberg || "" %></td></tr>
-    <tr><th>Time Estimation (30s)</th><td><%= data.MRomberg || "" %></td></tr>
-    <tr><th>Walk and Turn (notes)</th><td><%= data.WnT || "" %></td></tr>
-    <tr><th>One Leg Stand (L/R)</th><td><%= data.OLS || "" %></td></tr>
-    <tr><th>Finger to Nose</th><td><%= data.FTN || "" %></td></tr>
+  <div class="section">Modified Romberg Balance</div>
+  <table class="matrix">
+    <tr><th>Front/Back Sway</th><td><%= fmt(data.MRB_1) %></td><th>Side Sway</th><td><%= fmt(data.MRB_2) %></td><th>Time Estimation</th><td><%= fmt(data.MRB_Time) %></td></tr>
+    <tr><th colspan="6">Notes</th></tr>
+    <tr><td colspan="6"><%= fmt(data.MRB_Notes) %></td></tr>
   </table>
 
-  <!-- Vitals & Pupils -->
-  <div class="section">Vital Signs & Pupils</div>
-  <table class="table">
+  <div class="section">Walk and Turn</div>
+  <table class="matrix">
     <tr>
-      <th>Second Pulse / Time</th><td><%= data.Pulse2 || "" %></td>
-      <th>Blood Pressure</th><td><%= data.BP || "" %></td>
-      <th>Body Temperature</th><td><%= data.Temp || "" %></td>
+      <th>Refused</th><td><%= data.WAT_Refused ? 'Yes' : '' %></td>
+      <th>Not Given</th><td><%= data.WAT_NotGiven ? 'Yes' : '' %></td>
+      <th>Footwear</th><td><%= fmt(data.WAT_Footwear) %></td>
     </tr>
     <tr>
-      <th>Pupil Size — Room</th><td><%= data.Pupil_Room || "" %></td>
-      <th>Pupil Size — Darkness</th><td><%= data.Pupil_Dark || "" %></td>
-      <th>Pupil Size — Direct/Near</th><td><%= data.Pupil_Near || "" %></td>
-    </tr>
-    <tr>
-      <th>Reaction to Light</th><td><%= data.Pupil_LightReact || "" %></td>
-      <th>Third Pulse / Time</th><td><%= data.Pulse3 || "" %></td>
-      <th>UV Light used</th><td><%= data.UV_Used || "" %></td>
-    </tr>
-  </table>
-
-  <!-- Oral / Nasal Cavity -->
-  <div class="section">Oral / Nasal Cavity</div>
-  <table class="table">
-    <tr><th>Oral Cavity</th><td><%= data.Oral_Cavity || "" %></td></tr>
-    <tr><th>Nasal Cavity</th><td><%= data.Nasal_Cavity || "" %></td></tr>
-    <tr><th>Rebound Dilation</th><td><%= data.Rebound_Dilation || "" %></td></tr>
-  </table>
-
-  <!-- Drug Use Details -->
-  <div class="section">Drug Use Details</div>
-  <table class="table">
-    <tr><th>What drugs/medications have you been using?</th><td><%= data.Drugs_Used || "" %></td></tr>
-    <tr><th>How much?</th><td><%= data.Dose || "" %></td></tr>
-    <tr><th>Time of use</th><td><%= data.Time_of_Use || "" %></td></tr>
-    <tr><th>Where were the drugs used?</th><td><%= data.Where_Used || "" %></td></tr>
-    <tr><th>Signs of ingestion</th><td><%= data.Ingestion || "" %></td></tr>
-  </table>
-
-  <!-- Timeline -->
-  <div class="section">Timeline</div>
-  <table class="table">
-    <tr>
-      <th>Date/time of arrest</th><td><%= data.Arrest_DateTime || "" %></td>
-      <th>Time DRE notified</th><td><%= data.DRE_Notified || "" %></td>
-    </tr>
-    <tr>
-      <th>Evaluation start</th><td><%= data.Eval_Start || data.Eval_Time || "" %></td>
-      <th>Evaluation complete</th><td><%= data.Eval_Complete || "" %></td>
-    </tr>
-  </table>
-
-  <!-- Toxicology -->
-  <div class="section">Toxicology</div>
-  <table class="table">
-    <tr>
-      <th>Oral Fluid</th><td><%= data.Oral_Fluid || "" %></td>
-      <th>Instrument #</th><td><%= data.Instrument_Number || "" %></td>
-      <th>Results</th><td><%= data.Oral_Results || "" %></td>
-    </tr>
-    <tr>
-      <th>Urine</th><td><%= data.Urine || "" %></td>
-      <th>Blood</th><td><%= data.Blood || "" %></td>
-      <th>Collected By</th><td><%= data.Collected_By || "" %></td>
-    </tr>
-  </table>
-
-  <!-- Opinion / Flags -->
-  <div class="section">Opinion of Evaluator</div>
-  <table class="table">
-    <tr><th>Drug Categories Indicated</th><td><%= data.Indicated || "" %></td></tr>
-    <tr><th>Opinion</th><td><%= data.Opinion || "" %></td></tr>
-    <tr>
-      <th>Refused entire evaluation</th>
-      <td>
-        <span class="chk"><% if (String(data.Refused_All||"").match(/^(1|true|yes|present|refused)$/i)) { %><span class="fill"></span><% } %></span>
-        <%= data.Refused_All || "" %>
+      <th>Instruction Phase</th>
+      <td colspan="5">
+        Balance: <%= fmt(data.WAT_Balance) %> · Starts too soon: <%= fmt(data.WAT_Too_Soon) %> · Stops: <%= fmt(data.WAT_Stops_1) %>
+        · Misses heel-to-toe: <%= fmt(data.WAT_Miss_1) %> · Steps off line: <%= fmt(data.WAT_Off_1) %> · Raises arms: <%= fmt(data.WAT_Arms_1) %>
+        · Wrong steps: <%= fmt(data.WAT_Steps_1) %>
       </td>
     </tr>
     <tr>
-      <th>Stopped participating during evaluation</th>
-      <td>
-        <span class="chk"><% if (String(data.Stopped_Participating||"").match(/^(1|true|yes|present|refused)$/i)) { %><span class="fill"></span><% } %></span>
-        <%= data.Stopped_Participating || "" %>
+      <th>Walking Phase</th>
+      <td colspan="5">
+        Stops: <%= fmt(data.WAT_Stops_2) %> · Misses heel-to-toe: <%= fmt(data.WAT_Miss_2) %> · Steps off line: <%= fmt(data.WAT_Off_2) %>
+        · Raises arms: <%= fmt(data.WAT_Arms_2) %> · Wrong steps: <%= fmt(data.WAT_Steps_2) %>
       </td>
     </tr>
+    <tr><th>Turn</th><td colspan="5"><%= fmt(data.WAT_Turn) %></td></tr>
+    <tr><th>Unable to perform</th><td colspan="5"><%= fmt(data.WAT_Cant_Do) %></td></tr>
+    <tr><th>Notes</th><td colspan="5"><%= fmt(data.WAT_Notes) %></td></tr>
   </table>
 
-  <div class="grid-3" style="margin-top:8px">
-    <div class="kv"><div class="k">DRE’s Signature</div><div class="v" style="height:22px"></div></div>
-    <div class="kv"><div class="k">Approved by & DRE number</div><div class="v" style="height:22px"></div></div>
-    <div class="kv"><div class="k">Date</div><div class="v" style="height:22px"></div></div>
-  </div>
+  <div class="section">One Leg Stand</div>
+  <table class="matrix">
+    <tr><th>Leg</th><th>Count</th><th>Sways</th><th>Raises Arms</th><th>Hops</th><th>Foot Down</th><th>Refused</th><th>Not Given</th></tr>
+    <% ["L","R"].forEach(side => { %>
+    <tr>
+      <th><%= side === 'L' ? 'Left' : 'Right' %></th>
+      <td><%= fmt(data[`OLS_${side}_Count`]) %></td>
+      <td><%= data[`OLS_${side}_Sway`] ? 'Yes' : '' %></td>
+      <td><%= data[`OLS_${side}_Arms`] ? 'Yes' : '' %></td>
+      <td><%= data[`OLS_${side}_Hop`] ? 'Yes' : '' %></td>
+      <td><%= data[`OLS_${side}_Down`] ? 'Yes' : '' %></td>
+      <td><%= data[`OLS_${side}_Refused`] ? 'Yes' : '' %></td>
+      <td><%= data[`OLS_${side}_Not_Given`] ? 'Yes' : '' %></td>
+    </tr>
+    <% }) %>
+  </table>
 
-  <div class="foot">Revised 02/2023 — Face Sheet Page 2</div>
+  <div class="section">Finger to Nose</div>
+  <table class="matrix">
+    <tr><th>Attempt</th><th>Sways</th><th>Uses Pad</th><th>Searches</th><th>Eyes Open</th><th>Wrong Hand</th><th>Missed Nose</th></tr>
+    <% [1,2,3,4,5,6].forEach(num => { %>
+    <tr>
+      <th><%= num %></th>
+      <td><%= data[`FTN_Sway_${num}`] ? 'Yes' : '' %></td>
+      <td><%= data[`FTN_Pad_${num}`] ? 'Yes' : '' %></td>
+      <td><%= data[`FTN_Searched_${num}`] ? 'Yes' : '' %></td>
+      <td><%= data[`FTN_Eyes_${num}`] ? 'Yes' : '' %></td>
+      <td><%= data[`FTN_Wrong_${num}`] ? 'Yes' : '' %></td>
+      <td><%= data[`FTN_Down_${num}`] ? 'Yes' : '' %></td>
+    </tr>
+    <% }) %>
+  </table>
+  <div class="foot">Face Sheet Page 2</div>
 </div>
 
-<!-- ===================== NARRATIVE ===================== -->
 <div class="sheet">
-  <div class="title">Drug Recognition Evaluation — Narrative</div>
-  <div class="narr"><%= (data.Narrative || "").trim() %></div>
+  <div class="title">DRUG INFLUENCE EVALUATION — FACE SHEET</div>
+  <div class="subtitle">Page 3 · Vitals · Oral/Nasal · Timeline · Opinion · Narrative</div>
+
+  <div class="section">Vital Signs & Pupils</div>
+  <table class="matrix">
+    <tr><th>Second Pulse</th><td><%= fmt(data.Pulse2_Display || data.Pulse2) %></td><th>Third Pulse</th><td><%= fmt(data.Pulse3_Display || data.Pulse3) %></td><th>Blood Pressure</th><td><%= fmt(data.BP) %></td></tr>
+    <tr><th>Temperature</th><td><%= fmt(data.Body_Temp) %></td><th colspan="4">Vitals Notes</th></tr>
+    <tr><td colspan="6"><%= fmt(data.Vital_Notes) %></td></tr>
+  </table>
+  <table class="matrix">
+    <tr><th></th><th>Room Light</th><th>Darkness</th><th>Direct</th><th>Direct Range</th></tr>
+    <tr><th>Left</th><td><%= fmt(data.Room_Light_L) %></td><td><%= fmt(data.Darkness_L) %></td><td><%= fmt(data.Direct_L) %></td><td><%= fmt(data.Direct_L1) %></td></tr>
+    <tr><th>Right</th><td><%= fmt(data.Room_Light_R) %></td><td><%= fmt(data.Darkness_R) %></td><td><%= fmt(data.Direct_R) %></td><td><%= fmt(data.Direct_R1) %></td></tr>
+    <tr><th colspan="5">Additional Pupils Info</th></tr>
+    <tr><td colspan="5">UV Light Used: <%= data.UV_Light ? 'Yes' : 'No' %> · Range of sizes: <%= data.Direct_Light_Range ? 'Yes' : 'No' %></td></tr>
+  </table>
+
+  <div class="section">Oral / Nasal / Muscle Tone</div>
+  <table class="matrix">
+    <tr><th>Oral Cavity</th><td><%= fmt(data.Oral_Notes) %></td><th>Nasal Cavity</th><td><%= fmt(data.Nasal_Notes) %></td></tr>
+    <tr><th>Reaction to Light</th><td><%= fmt(data.Reaction) %></td><th>Rebound Dilation</th><td><%= fmt(data.Rebound_Dilation) %></td></tr>
+    <tr><th>Muscle Tone</th><td><%= fmt(data.Muscle_Tone) %></td><th>Notes</th><td><%= fmt(data.Muscle_Tone_Notes) %></td></tr>
+    <tr><th colspan="4">Injection Sites</th></tr>
+    <tr><td colspan="4"><%= data.Injection_None_Observed ? 'No injection sites observed' : '' %></td></tr>
+  </table>
+
+  <div class="section">Drug Use Details</div>
+  <table class="matrix">
+    <tr><th>Drugs / Medications</th><td><%= fmt(data.Drugs_Used) %></td></tr>
+    <tr><th>Amount Used</th><td><%= fmt(data.Drugs_Amount) %></td></tr>
+    <tr><th>Time of Use</th><td><%= fmt(data.Drugs_Time) %></td></tr>
+    <tr><th>Where Used</th><td><%= fmt(data.Drugs_Location) %></td></tr>
+  </table>
+
+  <div class="section">Timeline</div>
+  <table class="matrix">
+    <tr><th>Arrest Date</th><td><%= fmt(data.Arrest_Date) %></td><th>Arrest Time</th><td><%= fmt(data.Arrest_Time) %></td></tr>
+    <tr><th>DRE Notified</th><td><%= fmt(data.Notified_Time) %></td><th>Evaluation Start</th><td><%= fmt(data.Eval_Start_Time) %></td></tr>
+    <tr><th>Evaluation Complete</th><td colspan="3"><%= fmt(data.Eval_End_Time) %></td></tr>
+  </table>
+
+  <div class="section">Evaluator Opinion</div>
+  <table class="matrix">
+    <tr>
+      <th>Refused Evaluation</th><td><%= data.Subject_Refused ? 'Yes' : '' %></td>
+      <th>Stopped Participating</th><td><%= data.Subject_Stopped ? 'Yes' : '' %></td>
+      <th>Not Impaired</th><td><%= data.Not_Impaired ? 'Yes' : '' %></td>
+    </tr>
+    <tr><th colspan="6">Drug Categories Indicated</th></tr>
+    <tr>
+      <td colspan="6">
+        <% [
+          ['Medical', 'Medical'],
+          ['Alcohol','Alcohol'],
+          ['CNS_Depressant','CNS Depressant'],
+          ['CNS_Stimulant','CNS Stimulant'],
+          ['Hallucinogen','Hallucinogen'],
+          ['Dissociative_Anesthetic','Dissociative Anesthetic'],
+          ['Narcotic_Analgesic','Narcotic Analgesic'],
+          ['Inhalant','Inhalant'],
+          ['Cannabis','Cannabis']
+        ].forEach(([field,label]) => { %>
+          <span class="pill"><span style="width:10px;height:10px;border:1px solid #4b5563;display:inline-block;margin-right:4px;background:<%= data[field] ? '#0c2e63' : 'transparent' %>;"></span><%= label %></span>
+        <% }) %>
+      </td>
+    </tr>
+  </table>
+  <div class="section">Opinion / Notes</div>
+  <div class="box"><%= fmt(data.Opinion) %></div>
+
+  <div class="section">Narrative</div>
+  <div class="narr"><%= (data.Narrative || '').trim() %></div>
+
+  <div class="foot">Face Sheet Page 3</div>
 </div>
 
 </body>

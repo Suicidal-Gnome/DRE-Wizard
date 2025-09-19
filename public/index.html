@@ -2,378 +2,879 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>DRE Face Sheet — Full Web Form</title>
+  <title>DRE Evaluation Wizard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <style>
     :root{
-      --bg:#f8fafc; --card:#fff; --line:#e5e7eb; --muted:#6b7280; --ink:#0a1325; --accent:#0b5ed7;
-      --radius:8px;
+      --bg:#f5f7fb;--card:#fff;--line:#d8deeb;--muted:#6b7280;--ink:#102247;--accent:#0b5ed7;
+      --radius:10px;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:var(--bg);color:var(--ink)}
-    header{background:linear-gradient(90deg,#062c56,#0b3e7a);color:#fff;padding:14px 18px}
-    header h1{margin:0;font-size:18px}
-    main{max-width:1100px;margin:16px auto;padding:0 14px}
-    .panel{background:var(--card);border-radius:10px;box-shadow:0 2px 10px rgba(10,20,40,.06);padding:14px}
-
-    .sec{margin-top:12px;border:1px solid var(--line);border-radius:10px}
-    .sec h2{margin:0;padding:10px 12px;font-size:14px;background:#f2f5fb;border-bottom:1px solid var(--line)}
-
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px}
-    .grid.two{grid-template-columns:repeat(2,1fr)}
-    .grid.one{grid-template-columns:1fr}
-    .span-2{grid-column:span 2}
-    .span-3{grid-column:span 3}
-
-    label{display:block;font-size:12px;color:var(--muted)}
-    input,textarea,select{
-      width:100%;margin-top:4px;padding:8px;border:1px solid var(--line);
-      border-radius:var(--radius);font-size:14px;background:#fff
-    }
-    textarea{min-height:80px;resize:vertical}
-
-    /* Group outline matches inputs */
-    .group{
-      border:1px solid var(--line); border-radius:var(--radius); padding:8px;
-      background:#fff; margin-top:4px
-    }
-    .group-title{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .inline{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-    .inline input[type="text"]{min-width:260px}
-
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 12px;font-weight:600;cursor:pointer}
-    button.secondary{background:#e9edf6;color:#062c56}
-    #narrative{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:8px;min-height:80px}
-    small.muted{color:var(--muted)}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    header{background:linear-gradient(120deg,#021a38,#093b74);color:#fff;padding:16px 20px}
+    header h1{margin:0;font-size:20px;font-weight:600}
+    main{max-width:1200px;margin:18px auto;padding:0 16px 32px}
+    .panel{background:var(--card);border-radius:18px;box-shadow:0 18px 45px rgba(12,28,63,.14);padding:18px 20px}
+    .sec{margin-top:18px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
+    .sec h2{margin:0;padding:14px 16px;font-size:15px;letter-spacing:.02em;text-transform:uppercase;background:linear-gradient(120deg,#eef3ff,#f5f7fb);border-bottom:1px solid var(--line);color:#0c2e63}
+    .sec .body{padding:16px}
+    .grid{display:grid;gap:14px}
+    .grid-3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+    .grid-2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    .grid-1{grid-template-columns:minmax(0,1fr)}
+    .field label{display:flex;flex-direction:column;font-size:13px;color:var(--muted);gap:6px;font-weight:500}
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+    textarea{min-height:90px;resize:vertical}
+    .inline{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f1f4fd;border:1px solid var(--line);font-size:13px;font-weight:500;color:var(--ink)}
+    .group{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:6px}
+    .group-title{font-size:13px;font-weight:600;text-transform:uppercase;color:#0c2e63;margin-bottom:8px}
+    .group .option-row{display:flex;flex-wrap:wrap;gap:12px}
+    .group label.option{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);font-weight:500}
+    table.matrix{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+    table.matrix th,table.matrix td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+    table.matrix th{background:#f4f7ff;color:#0c2e63;font-weight:600}
+    .muted{color:var(--muted)}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+    button{background:var(--accent);color:#fff;font-weight:600;border:none;border-radius:999px;padding:10px 16px;cursor:pointer;font-size:14px}
+    button.secondary{background:#eaf0ff;color:#0c2e63}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .actions label.file{display:inline-flex;align-items:center;gap:10px;background:#eaf0ff;color:#0c2e63;border-radius:999px;padding:10px 16px;cursor:pointer}
+    .actions input[type=file]{display:none}
+    #narrative{background:#fdfdff;border:1px dashed var(--line);border-radius:12px;padding:16px;min-height:120px;font-size:14px;line-height:1.5;color:#1b2b4b;white-space:pre-wrap}
+    .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+    .pill-row label{display:inline-flex;align-items:center;gap:6px;background:#f4f6fd;border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:12px;color:#0c2e63}
+    .subheading{font-size:12px;text-transform:uppercase;font-weight:600;color:#0c2e63;margin:10px 0 4px}
+    .note{font-size:12px;color:#4b5563;margin-top:4px}
+    .tight{gap:8px}
+    .field.full{grid-column:1/-1}
+    .table-scroll{overflow-x:auto}
+    .table-scroll table{min-width:680px}
+    .mini-input{width:72px}
+    .checkbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
   </style>
 </head>
 <body>
-<header><h1>DRE Face Sheet — Full Web Form</h1></header>
+<header><h1>DRE Evaluation Wizard</h1></header>
 <main>
   <div class="panel">
     <form id="dreForm"></form>
     <div class="actions">
-      <button id="previewBtn" type="button">Preview Narrative</button>
-      <button id="pdfBtn" type="button" class="secondary">Generate PDF</button>
-      <button id="saveJson" type="button" class="secondary">Download JSON</button>
-      <label class="secondary" style="padding:10px;border-radius:8px;display:inline-block">
-        <input type="file" id="loadJson" accept=".json" style="display:none"/>Load JSON
-      </label>
-      <button id="clearBtn" type="button" class="secondary">Clear</button>
+      <button type="button" id="previewBtn">Preview Narrative</button>
+      <button type="button" id="pdfBtn" class="secondary">Generate PDF</button>
+      <button type="button" id="saveJson" class="secondary">Download JSON</button>
+      <label class="file">Load JSON<input type="file" id="loadJson" accept=".json"></label>
+      <button type="button" id="clearBtn" class="secondary">Clear</button>
     </div>
-    <h3 style="margin:12px 0 6px">Narrative Preview</h3>
+    <h3 style="margin:0 0 8px;font-size:16px;color:#0c2e63">Narrative Preview</h3>
     <div id="narrative"></div>
-    <small class="muted">PDF export hits <code>/pdf</code>. Narrative preview hits <code>/narrative</code>.</small>
+    <p class="muted" style="margin-top:10px;font-size:12px">Preview calls <code>/narrative</code>; PDF uses <code>/pdf</code>.</p>
   </div>
 </main>
-
 <script>
-  // ========== Schema (with improved Case/Evaluator layout & outlined groups) ==========
-  const SCHEMA = [
-    ["Case / Evaluator","case",[
-      // Row 1
-      ["Evaluator","text","Evaluator (DRE Name)"],
-      ["DRE_Number","text","DRE #"],
-      ["Rolling_Log_Number","text","Rolling Log #"],
-      // Row 2
-      ["Case_Number","text","Case #"],
-      ["Recorder","text","Recorder / Witnesses","span-2"],
-      // Row 3
-      ["Arresting_Officer","text","Arresting Officer"],
-      ["Arresting_Agency","text","Officer’s Agency","span-2"],
-      // Row 4
-      ["Location","text","Evaluation Location","span-3"],
-      // Row 5 — groups: each spans one column (Miranda spans 2 so notes have room)
-      ["Crash_Group","crashExclusive","Crash"],
-      ["Chemical_Group","chemicalMulti","Chemical Test"],
-      ["Miranda_Group","miranda","Miranda Warning Given","span-2"],
-      // Row 6
-      ["Eval_Date","date","Date Examined"],
-      ["Eval_Time","time","Time Examined"],
-    ]],
-
-    ["Subject","subject",[
-      ["Subject_Name","text","Arrestee’s Name (Last, First, MI)","span-2"],
-      ["Subject_DOB","date","DOB"],
-      ["Subject_Age","number","Age"],
-      ["Subject_Gender","select","Sex",["Male","Female","Nonbinary/Other","Unknown"]],
-      ["Subject_Race","select","Race",[
-        "White","Black/African American","Asian",
-        "American Indian/Alaska Native","Native Hawaiian/Other Pacific Islander",
-        "Hispanic/Latino","Middle Eastern/North African","Other","Unknown"
-      ],"span-2"],
-      ["Breath_Result","text","Breath Test — Results"],
-      ["Breath_Instrument_Number","text","Breath Test — Instrument #"]
-    ]],
-
-    ["Interview","interview",[
-      ["Food_When","text","What have you eaten today? When?","span-3"],
-      ["Drinking","text","What have you been drinking? How much? Time of last drink?","span-3"],
-      ["Time_Now","text","Time now — Actual"],
-      ["Sleep","text","When did you last sleep? How long?","span-2"]
-    ]],
-
-    ["Medical / Physical","medical",[
-      ["Sick_Injured","text","Are you sick or injured?"],
-      ["Diabetic_Epileptic","text","Are you diabetic or epileptic?"],
-      ["Insulin","text","Do you take insulin?"],
-      ["Physical_Defects","text","Any physical defects?"],
-      ["Under_Doctor","text","Under the care of a doctor or dentist?"],
-      ["Medication_Drugs","text","Taking any medication or drugs?"]
-    ]],
-
-    ["Preliminary Exam","prelim",[
-      ["Attitude","text","Attitude"],
-      ["Coordination","text","Coordination"],
-      ["Speech","text","Speech"],
-      ["Breath_Odor","text","Breath Odor"],
-      ["Face","text","Face"],
-      ["Pulse1","text","First Pulse / Time"],
-      ["Corrective_Lenses","text","Corrective Lenses"],
-      ["Eyes_Blindness","text","Eyes Blindness"],
-      ["Tracking","text","Tracking"],
-      ["Pupil_Explain","text","Pupil size (explain)","span-2"],
-      ["Resting_Nyst","text","Resting Nystagmus"],
-      ["Vertical_Nyst","text","Vertical Nystagmus"],
-      ["Follow_Stimulus","text","Able to follow stimulus"],
-      ["Eyelids","text","Eyelids"],
-      ["Prelim_Notes","text","Preliminary Exam Notes","span-3"]
-    ]],
-
-    ["HGN / VGN / Convergence","hgn",[
-      ["HGN_Left","text","HGN Left Eye"],
-      ["HGN_Right","text","HGN Right Eye"],
-      ["VGN","text","VGN (present/absent)"],
-      ["HGN_LSP","text","Lack of Smooth Pursuit"],
-      ["HGN_MD","text","Maximum Deviation"],
-      ["HGN_AOO","text","Angle of Onset"],
-      ["LOC","text","Lack of Convergence","span-3"]
-    ]],
-
-    ["Psychophysical Tests","psychophys",[
-      ["Romberg","text","Modified Romberg Balance Test","span-3"],
-      ["MRomberg","text","Time Estimation (est. 30 sec)","span-3"],
-      ["WnT","text","Walk and Turn (notes/clues)","span-3"],
-      ["OLS","text","One Leg Stand (L/R, time/clues)","span-3"],
-      ["FTN","text","Finger to Nose","span-3"]
-    ]],
-
-    ["Vital Signs & Pupils","vitals",[
-      ["Pulse2","text","Second Pulse / Time"],
-      ["BP","text","Blood Pressure"],
-      ["Temp","text","Body Temperature"],
-      ["Pupil_Room","text","Pupil Size — Room light (L/R)"],
-      ["Pupil_Dark","text","Pupil Size — Darkness (L/R)"],
-      ["Pupil_Near","text","Pupil Size — Direct/Near (L/R)"],
-      ["Pupil_LightReact","text","Reaction to Light"],
-      ["Pulse3","text","Third Pulse / Time"],
-      ["UV_Used","text","UV light used (Y/N)"]
-    ]],
-
-    ["Oral / Nasal Cavity","oral",[
-      ["Oral_Cavity","text","Oral Cavity","span-3"],
-      ["Nasal_Cavity","text","Nasal Cavity","span-3"],
-      ["Rebound_Dilation","text","Rebound Dilation","span-3"]
-    ]],
-
-    ["Drug Use Details","druguse",[
-      ["Drugs_Used","text","What drugs or medications have you been using?","span-3"],
-      ["Dose","text","How much?","span-3"],
-      ["Time_of_Use","text","Time of use","span-3"],
-      ["Where_Used","text","Where were the drugs used?","span-3"],
-      ["Ingestion","text","Signs of ingestion (odor/residue/paraphernalia)","span-3"]
-    ]],
-
-    ["Timeline","timeline",[
-      ["Arrest_DateTime","text","Date and time of arrest","span-3"],
-      ["DRE_Notified","text","Time DRE notified","span-3"],
-      ["Eval_Start","text","Evaluation start time"],
-      ["Eval_Complete","text","Evaluation completion time"]
-    ]],
-
-    ["Toxicology","toxicology",[
-      ["Oral_Fluid","text","Oral Fluid"],
-      ["Instrument_Number","text","Instrument #"],
-      ["Oral_Results","text","Oral fluid results"],
-      ["Urine","text","Urine"],
-      ["Blood","text","Blood"],
-      ["Collected_By","text","Collected By"]
-    ]],
-
-    ["Opinion / Flags","opinion",[
-      ["Indicated","text","Drug Categories Indicated","span-3"],
-      ["Opinion","textarea","DRE Opinion / Conclusion","span-3"],
-      ["Refused_All","text","Subject refused entire evaluation (Y/N/notes)","span-3"],
-      ["Stopped_Participating","text","Subject stopped participating during eval (Y/N/when)","span-3"]
-    ]]
+  const STATE_OPTIONS = [
+    "", "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+    "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+    "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota",
+    "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+    "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon",
+    "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
+    "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
   ];
+
+  const HGN_PRESENT_OPTIONS = ["None", "Present"];
+  const HGN_ANGLE_OPTIONS = ["None", "Immediate", "30", "35", "40", "45"];
+  const OLS_SIDES = [
+    { key: "L", title: "Left Leg" },
+    { key: "R", title: "Right Leg" }
+  ];
+  const FTN_ATTEMPTS = [1,2,3,4,5,6];
 
   const formEl = document.getElementById("dreForm");
 
-  function build(){
-    formEl.innerHTML = "";
-    for (const [title, key, fields] of SCHEMA){
-      const sec = document.createElement("section");
-      sec.className = "sec";
-      sec.innerHTML = `<h2>${title}</h2>`;
-      const grid = document.createElement("div");
-      grid.className = fields.length <= 2 ? "grid one" : (fields.length <= 6 ? "grid two" : "grid");
-
-      for (const f of fields){
-        const [name, type, label, extra] = f;
-        const wrap = document.createElement("div");
-        if (extra && typeof extra === "string" && extra.startsWith("span-")) wrap.classList.add(extra);
-
-        if (type === "select"){
-          wrap.innerHTML = `<label>${label}
-            <select name="${name}" id="${name}">
-              ${(f[3]||[]).map(opt=>`<option value="${opt}">${opt}</option>`).join("")}
-            </select></label>`;
-
-        } else if (type === "miranda"){
-          wrap.innerHTML = `
-            <div class="group">
-              <div class="group-title">${label}</div>
-              <div class="inline">
-                <label><input type="radio" name="Miranda" value="Yes"> Yes</label>
-                <label><input type="radio" name="Miranda" value="No"> No</label>
-                <input type="text" name="Miranda_Notes" id="Miranda_Notes" placeholder="Notes (optional)">
-              </div>
-            </div>`;
-
-        } else if (type === "crashExclusive"){
-          wrap.innerHTML = `
-            <div class="group">
-              <div class="group-title">${label} <span class="muted">(select one)</span></div>
-              <div class="inline" id="CrashGroup">
-                <label><input type="checkbox" name="Crash_None" value="true"> None</label>
-                <label><input type="checkbox" name="Crash_Fatal" value="true"> Fatal</label>
-                <label><input type="checkbox" name="Crash_Injury" value="true"> Injury</label>
-                <label><input type="checkbox" name="Crash_Property" value="true"> Property</label>
-              </div>
-            </div>`;
-
-        } else if (type === "chemicalMulti"){
-          wrap.innerHTML = `
-            <div class="group">
-              <div class="group-title">${label} <span class="muted">(select all that apply)</span></div>
-              <div class="inline">
-                <label><input type="checkbox" name="Chemical_Refused" value="true"> Refused</label>
-                <label><input type="checkbox" name="Chemical_OralFluid" value="true"> Oral Fluid</label>
-                <label><input type="checkbox" name="Chemical_Blood" value="true"> Blood</label>
-                <label><input type="checkbox" name="Chemical_Urine" value="true"> Urine</label>
-              </div>
-            </div>`;
-
-        } else if (type === "textarea"){
-          wrap.innerHTML = `<label>${label}<textarea name="${name}" id="${name}"></textarea></label>`;
-
-        } else {
-          const t = (type==="number") ? "number" : (type==="date"?"date":(type==="time"?"time":"text"));
-          wrap.innerHTML = `<label>${label}<input name="${name}" id="${name}" type="${t}"/></label>`;
-        }
-
-        grid.appendChild(wrap);
-      }
-
-      sec.appendChild(grid);
-      formEl.appendChild(sec);
-    }
-
-    // Enforce exclusive Crash checkboxes (only one checked at a time)
-    const crashInputs = formEl.querySelectorAll('#CrashGroup input[type="checkbox"]');
-    crashInputs.forEach(cb=>{
-      cb.addEventListener('change', ()=>{
-        if (cb.checked){
-          crashInputs.forEach(x=>{ if (x!==cb) x.checked = false; });
-        }
-      });
-    });
+  function optionMarkup(value, label){
+    const text = label !== undefined ? label : value;
+    return `<option value="${value}">${text}</option>`;
   }
 
-  // ---------- Data helpers ----------
+  function renderInput({ name, label, type = "text", className = "", attrs = "", placeholder = "" }){
+    return `<div class="field${className ? " "+className : ""}"><label>${label}<input type="${type}" name="${name}" id="${name}" placeholder="${placeholder}" ${attrs}></label></div>`;
+  }
+
+  function renderSelect({ name, label, options = [], className = "" }){
+    const opts = options.map(opt => Array.isArray(opt) ? optionMarkup(opt[0], opt[1]) : optionMarkup(opt, opt)).join("");
+    return `<div class="field${className ? " "+className : ""}"><label>${label}<select name="${name}" id="${name}">${opts}</select></label></div>`;
+  }
+
+  function renderTextarea({ name, label, className = "" }){
+    return `<div class="field${className ? " "+className : ""}"><label>${label}<textarea name="${name}" id="${name}"></textarea></label></div>`;
+  }
+
+  function renderCheckbox({ name, label, value = "true", className = "", attrs = "" }){
+    return `<label class="option ${className}"><input type="checkbox" name="${name}" value="${value}" ${attrs}> ${label}</label>`;
+  }
+
+  function renderYesNo({ name, label, className = "" }){
+    return `
+      <div class="group yes-no ${className}" data-field="${name}">
+        <div class="group-title">${label}</div>
+        <div class="option-row">
+          <label class="option"><input type="radio" name="${name}" value="Yes"> Yes</label>
+          <label class="option"><input type="radio" name="${name}" value="No"> No</label>
+        </div>
+      </div>`;
+  }
+
+  function renderYesNoNotes({ name, label, notesName, notesLabel = "Notes" }){
+    return `
+      <div class="group yes-no-notes" data-field="${name}" data-notes="${notesName}">
+        <div class="group-title">${label}</div>
+        <div class="option-row">
+          <label class="option"><input type="radio" name="${name}" value="Yes"> Yes</label>
+          <label class="option"><input type="radio" name="${name}" value="No"> No</label>
+          <input type="text" class="notes hidden" name="${notesName}" id="${notesName}" placeholder="${notesLabel}">
+        </div>
+      </div>`;
+  }
+
+  function renderCheckboxGroup({ name, label, options = [], exclusive = null }){
+    const attr = exclusive ? ` data-exclusive="${exclusive}"` : "";
+    const items = options.map(opt => `<label class="option"><input type="checkbox" name="${name}" value="${opt}" data-collect="list"> ${opt}</label>`).join("");
+    return `
+      <div class="group checkbox-list" data-field="${name}"${attr}>
+        <div class="group-title">${label}</div>
+        <div class="option-row">${items}</div>
+      </div>`;
+  }
+
+  function renderCorrectiveLenses(){
+    return `
+      <div class="group corrective-lenses">
+        <div class="group-title">Corrective Lenses</div>
+        <div class="option-row">
+          ${renderCheckbox({ name:"Lenses_None", label:"None", attrs:"data-exclusive" })}
+          ${renderCheckbox({ name:"Glasses", label:"Glasses" })}
+          ${renderCheckbox({ name:"Contacts", label:"Contacts" })}
+          <div class="chip contact-type hidden">
+            <span>Contact type:</span>
+            <label class="option"><input type="radio" name="Lens_Type" value="Hard"> Hard</label>
+            <label class="option"><input type="radio" name="Lens_Type" value="Soft"> Soft</label>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderPupilSize(){
+    return `
+      <div class="group pupil-size" data-field="Pupil_Size">
+        <div class="group-title">Pupil Size</div>
+        <div class="option-row">
+          <label class="option"><input type="radio" name="Pupil_Size" value="Equal"> Equal</label>
+          <label class="option"><input type="radio" name="Pupil_Size" value="Unequal"> Unequal</label>
+          <input type="text" class="notes hidden" name="Pupil_Size_Notes" id="Pupil_Size_Notes" placeholder="Measurements / notes">
+        </div>
+      </div>`;
+  }
+
+  function renderHGN(){
+    return `
+      <div class="table-scroll">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Lack of Smooth Pursuit</th>
+              <th>Distinct &amp; Sustained at Max Deviation</th>
+              <th>Angle of Onset</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Left Eye</th>
+              <td><select name="HGN_Pursuit_L" id="HGN_Pursuit_L">${HGN_PRESENT_OPTIONS.map(optionMarkup).join("")}</select></td>
+              <td><select name="HGN_Max_L" id="HGN_Max_L">${HGN_PRESENT_OPTIONS.map(optionMarkup).join("")}</select></td>
+              <td><select name="HGN_Angle_L" id="HGN_Angle_L">${HGN_ANGLE_OPTIONS.map(optionMarkup).join("")}</select></td>
+            </tr>
+            <tr>
+              <th>Right Eye</th>
+              <td><select name="HGN_Pursuit_R" id="HGN_Pursuit_R">${HGN_PRESENT_OPTIONS.map(optionMarkup).join("")}</select></td>
+              <td><select name="HGN_Max_R" id="HGN_Max_R">${HGN_PRESENT_OPTIONS.map(optionMarkup).join("")}</select></td>
+              <td><select name="HGN_Angle_R" id="HGN_Angle_R">${HGN_ANGLE_OPTIONS.map(optionMarkup).join("")}</select></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderMRB(){
+    return `
+      <div class="grid grid-3">
+        ${renderInput({ name:"MRB_1", label:"Est. front/back sway" })}
+        ${renderInput({ name:"MRB_2", label:"Est. side sway" })}
+        ${renderInput({ name:"MRB_Time", label:"Time estimation (sec)", type:"number" })}
+      </div>
+      <div class="pill-row">
+        ${renderCheckbox({ name:"MRB_Refused", label:"Refused" })}
+        ${renderCheckbox({ name:"MRB_NotGiven", label:"Not given" })}
+      </div>
+      ${renderTextarea({ name:"MRB_Notes", label:"Modified Romberg notes" })}`;
+  }
+
+  function renderWAT(){
+    const stage1 = [
+      { name:"WAT_Balance", label:"Cannot keep balance (count)" },
+      { name:"WAT_Too_Soon", label:"Starts too soon (count)" },
+      { name:"WAT_Footwear", label:"Footwear", type:"text" }
+    ];
+    const walking = [
+      { name:"WAT_Stops_1", label:"Stops (instruction phase)", type:"number" },
+      { name:"WAT_Stops_2", label:"Stops (walking)", type:"number" },
+      { name:"WAT_Miss_1", label:"Misses heel-to-toe (instruction)", type:"number" },
+      { name:"WAT_Miss_2", label:"Misses heel-to-toe (walking)", type:"number" },
+      { name:"WAT_Off_1", label:"Steps off line (instruction)", type:"number" },
+      { name:"WAT_Off_2", label:"Steps off line (walking)", type:"number" },
+      { name:"WAT_Arms_1", label:"Raises arms (instruction)", type:"number" },
+      { name:"WAT_Arms_2", label:"Raises arms (walking)", type:"number" },
+      { name:"WAT_Steps_1", label:"Wrong number of steps (instruction)", type:"number" },
+      { name:"WAT_Steps_2", label:"Wrong number of steps (walking)", type:"number" }
+    ];
+    return `
+      <div class="pill-row">
+        ${renderCheckbox({ name:"WAT_Refused", label:"Refused" })}
+        ${renderCheckbox({ name:"WAT_NotGiven", label:"Not given" })}
+      </div>
+      <div class="grid grid-3">${stage1.map(def => renderInput({ ...def, type:def.type || "number" })).join("")}</div>
+      <div class="grid grid-3">${walking.map(def => renderInput({ ...def, type:def.type || "number" })).join("")}</div>
+      ${renderInput({ name:"WAT_Turn", label:"Turn performance" })}
+      ${renderInput({ name:"WAT_Cant_Do", label:"Unable to perform (explain)" })}
+      ${renderTextarea({ name:"WAT_Notes", label:"Walk and Turn notes" })}`;
+  }
+
+  function renderOLS(){
+    return `
+      <div class="table-scroll">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>Leg</th>
+              <th>Count</th>
+              <th colspan="4">Clues</th>
+              <th>Refused</th>
+              <th>Not given</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${OLS_SIDES.map(side => `
+              <tr>
+                <th>${side.title}</th>
+                <td><input type="number" name="OLS_${side.key}_Count" id="OLS_${side.key}_Count" class="mini-input"></td>
+                <td>${renderCheckbox({ name:`OLS_${side.key}_Sway`, label:"Sways" })}</td>
+                <td>${renderCheckbox({ name:`OLS_${side.key}_Arms`, label:"Raises arms" })}</td>
+                <td>${renderCheckbox({ name:`OLS_${side.key}_Hop`, label:"Hops" })}</td>
+                <td>${renderCheckbox({ name:`OLS_${side.key}_Down`, label:"Puts foot down" })}</td>
+                <td>${renderCheckbox({ name:`OLS_${side.key}_Refused`, label:"" })}</td>
+                <td>${renderCheckbox({ name:`OLS_${side.key}_Not_Given`, label:"" })}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderFTN(){
+    const clueLabels = [
+      ["Sway", "Sways"],
+      ["Pad", "Uses pad"],
+      ["Searched", "Searches for nose"],
+      ["Eyes", "Eyes open"],
+      ["Wrong", "Wrong hand"],
+      ["Down", "Missed nose"]
+    ];
+    return `
+      <div class="pill-row">
+        ${renderCheckbox({ name:"FTN_Refused", label:"Refused" })}
+        ${renderCheckbox({ name:"FTN_Not_Given", label:"Not given" })}
+      </div>
+      <div class="table-scroll">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>Attempt</th>
+              ${clueLabels.map(([,label]) => `<th>${label}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${FTN_ATTEMPTS.map(num => `
+              <tr>
+                <th>${num}</th>
+                ${clueLabels.map(([key]) => `<td>${renderCheckbox({ name:`FTN_${key}_${num}`, label:"" })}</td>`).join("")}
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderVitals(){
+    return `
+      <div class="grid grid-3">
+        ${renderInput({ name:"Pulse2", label:"Second pulse", type:"number" })}
+        ${renderInput({ name:"Pulse2_Time", label:"Second pulse time", type:"time" })}
+        ${renderInput({ name:"Pulse3", label:"Third pulse", type:"number" })}
+        ${renderInput({ name:"Pulse3_Time", label:"Third pulse time", type:"time" })}
+        ${renderInput({ name:"Systolic", label:"Systolic", type:"number" })}
+        ${renderInput({ name:"Diastolic", label:"Diastolic", type:"number" })}
+        ${renderInput({ name:"Body_Temp", label:"Body temperature", type:"text" })}
+        ${renderInput({ name:"Vital_Notes", label:"Vitals notes" })}
+      </div>
+      <div class="subheading">Pupil Sizes (mm)</div>
+      <div class="table-scroll">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th>Lighting</th>
+              <th>Left</th>
+              <th>Right</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th>Room light</th><td><input type="text" name="Room_Light_L" id="Room_Light_L"></td><td><input type="text" name="Room_Light_R" id="Room_Light_R"></td></tr>
+            <tr><th>Darkness</th><td><input type="text" name="Darkness_L" id="Darkness_L"></td><td><input type="text" name="Darkness_R" id="Darkness_R"></td></tr>
+            <tr><th>Direct/Near</th><td><input type="text" name="Direct_L" id="Direct_L"></td><td><input type="text" name="Direct_R" id="Direct_R"></td></tr>
+            <tr><th>Direct/Near Range L</th><td colspan="2"><input type="text" name="Direct_L1" id="Direct_L1" placeholder="Low - High"></td></tr>
+            <tr><th>Direct/Near Range R</th><td colspan="2"><input type="text" name="Direct_R1" id="Direct_R1" placeholder="Low - High"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pill-row">
+        ${renderCheckbox({ name:"UV_Light", label:"UV light used" })}
+        ${renderCheckbox({ name:"Direct_Light_Range", label:"Use range of sizes" })}
+      </div>`;
+  }
+
+  function renderOral(){
+    return `
+      <div class="grid grid-2">
+        ${renderInput({ name:"Oral_Notes", label:"Oral cavity" })}
+        ${renderInput({ name:"Nasal_Notes", label:"Nasal cavity" })}
+        ${renderInput({ name:"Reaction", label:"Reaction to light" })}
+        ${renderYesNo({ name:"Rebound_Dilation", label:"Rebound dilation observed?" })}
+      </div>
+      <div class="grid grid-2">
+        ${renderRadio({ name:"Muscle_Tone", label:"Muscle tone", options:["Flaccid","Normal","Rigid"] })}
+        ${renderInput({ name:"Muscle_Tone_Notes", label:"Muscle tone notes" })}
+      </div>
+      <div class="pill-row">
+        ${renderCheckbox({ name:"Injection_None_Observed", label:"No injection sites observed" })}
+      </div>`;
+  }
+
+  function renderRadio({ name, label, options = [], className = "" }){
+    return `
+      <div class="group radio-options ${className}" data-field="${name}">
+        <div class="group-title">${label}</div>
+        <div class="option-row">
+          ${options.map(opt => `<label class="option"><input type="radio" name="${name}" value="${opt}"> ${opt}</label>`).join("")}
+        </div>
+      </div>`;
+  }
+
+  function renderDrugUse(){
+    return `
+      ${renderTextarea({ name:"Drugs_Used", label:"Drugs/medications used" })}
+      ${renderTextarea({ name:"Drugs_Amount", label:"Amount used" })}
+      <div class="grid grid-2">
+        ${renderInput({ name:"Drugs_Time", label:"Time of use" })}
+        ${renderInput({ name:"Drugs_Location", label:"Where used" })}
+      </div>`;
+  }
+
+  function renderTimeline(){
+    return `
+      <div class="grid grid-2">
+        ${renderInput({ name:"Arrest_Date", label:"Date of arrest", type:"date" })}
+        ${renderInput({ name:"Arrest_Time", label:"Time of arrest", type:"time" })}
+        ${renderInput({ name:"Notified_Time", label:"Time DRE notified", type:"time" })}
+        ${renderInput({ name:"Eval_Start_Time", label:"Evaluation start", type:"time" })}
+        ${renderInput({ name:"Eval_End_Time", label:"Evaluation complete", type:"time" })}
+      </div>`;
+  }
+
+  function renderOpinion(){
+    const flags = [
+      ["Not_Impaired", "Not impaired"],
+      ["Medical", "Medical"],
+      ["Alcohol", "Alcohol"],
+      ["CNS_Depressant", "CNS Depressant"],
+      ["CNS_Stimulant", "CNS Stimulant"],
+      ["Hallucinogen", "Hallucinogen"],
+      ["Dissociative_Anesthetic", "Dissociative Anesthetic"],
+      ["Narcotic_Analgesic", "Narcotic Analgesic"],
+      ["Inhalant", "Inhalant"],
+      ["Cannabis", "Cannabis"]
+    ];
+    return `
+      <div class="pill-row">
+        ${renderCheckbox({ name:"Subject_Refused", label:"Subject refused evaluation" })}
+        ${renderCheckbox({ name:"Subject_Stopped", label:"Subject stopped participating" })}
+      </div>
+      <div class="group">
+        <div class="group-title">Evaluator Opinion</div>
+        <div class="checkbox-grid">${flags.map(([field,label]) => renderCheckbox({ name:field, label })).join("")}</div>
+      </div>
+      ${renderTextarea({ name:"Opinion", label:"Narrative notes / conclusion" })}`;
+  }
+
+  function buildForm(){
+    const sections = [
+      {
+        title: "Case / Evaluator",
+        html: `
+          <div class="grid grid-3">
+            ${renderInput({ name:"Evaluator", label:"Evaluator (DRE Name)" })}
+            ${renderInput({ name:"DRE_Number", label:"DRE #" })}
+            ${renderInput({ name:"Rolling_Log_Number", label:"Rolling log #" })}
+            ${renderInput({ name:"Case_Number", label:"Case #" })}
+            ${renderInput({ name:"Incident_Number", label:"Incident #" })}
+            ${renderInput({ name:"Witnesses", label:"Recorder / Witnesses" })}
+            ${renderInput({ name:"Arresting_Officer", label:"Arresting officer" })}
+            ${renderInput({ name:"Arresting_Agency", label:"Officer's agency" })}
+            ${renderInput({ name:"Eval_Date", label:"Date examined", type:"date" })}
+            ${renderInput({ name:"Eval_Time", label:"Time examined", type:"time" })}
+            ${renderInput({ name:"Eval_Location", label:"Evaluation location", className:"full" })}
+            ${renderSelect({ name:"Location_State", label:"State", options:STATE_OPTIONS })}
+            ${renderInput({ name:"Location_County", label:"County / Parish / Borough" })}
+          </div>
+          ${renderYesNoNotes({ name:"Miranda", label:"Miranda warning given?", notesName:"Miranda_Given_By", notesLabel:"Given by" })}
+          <div class="group">
+            <div class="group-title">Crash</div>
+            <div class="option-row">
+              ${renderCheckbox({ name:"Crash_None", label:"None" })}
+              ${renderCheckbox({ name:"Crash_Fatal", label:"Fatal" })}
+              ${renderCheckbox({ name:"Crash_Injury", label:"Injury" })}
+              ${renderCheckbox({ name:"Crash_Property", label:"Property" })}
+            </div>
+          </div>
+          <div class="group">
+            <div class="group-title">Chemical Test</div>
+            <div class="option-row">
+              ${renderCheckbox({ name:"Chem_Refused", label:"Refused" })}
+              ${renderCheckbox({ name:"Chem_Oral", label:"Oral fluid" })}
+              ${renderCheckbox({ name:"Chem_Blood", label:"Blood" })}
+              ${renderCheckbox({ name:"Chem_Urine", label:"Urine" })}
+            </div>
+          </div>`
+      },
+      {
+        title: "Subject",
+        html: `
+          <div class="grid grid-3">
+            ${renderInput({ name:"Subject_Name", label:"Name (Last, First, MI)", className:"full" })}
+            ${renderInput({ name:"Subject_DOB", label:"DOB", type:"date" })}
+            ${renderInput({ name:"Subject_Age", label:"Age", type:"number", attrs:"readonly placeholder='Auto'" })}
+            ${renderSelect({ name:"Subject_Gender", label:"Sex", options:["","Male","Female","Nonbinary/Other","Unknown"] })}
+            ${renderSelect({ name:"Subject_Race", label:"Race", options:["","White","Black/African American","Asian","American Indian/Alaska Native","Native Hawaiian/Other Pacific Islander","Hispanic/Latino","Middle Eastern/North African","Other","Unknown"] })}
+            ${renderInput({ name:"Breath_Result", label:"Breath test result" })}
+            ${renderInput({ name:"Breath_Instrument", label:"Breath test instrument #" })}
+          </div>
+          <div class="pill-row">${renderCheckbox({ name:"Breath_Refused", label:"Breath test refused" })}</div>`
+      },
+      {
+        title: "Interview",
+        html: `
+          <div class="grid grid-3">
+            ${renderInput({ name:"What_Eaten", label:"What have you eaten?" })}
+            ${renderInput({ name:"When_Eaten", label:"When eaten?" })}
+            ${renderInput({ name:"What_Drinking", label:"What have you been drinking?", className:"full" })}
+            ${renderInput({ name:"When_Drinking", label:"When drinking?" })}
+            ${renderInput({ name:"Last_Drink", label:"Time of last drink" })}
+            ${renderInput({ name:"Time_Now", label:"Time now (stated)" })}
+            ${renderInput({ name:"Time_Actual", label:"Actual current time" })}
+            ${renderInput({ name:"Last_Slept", label:"When last slept" })}
+            ${renderInput({ name:"Sleep_Amount", label:"How long slept" })}
+          </div>`
+      },
+      {
+        title: "Medical / Physical",
+        html: `
+          ${renderYesNoNotes({ name:"Sick_Injured", label:"Sick or injured?", notesName:"Sick_Notes" })}
+          ${renderYesNoNotes({ name:"Diabetic_Epileptic", label:"Diabetic or epileptic?", notesName:"Diabetic_Eplieptic_Notes" })}
+          ${renderYesNo({ name:"Insulin", label:"Takes insulin?" })}
+          ${renderYesNoNotes({ name:"Defects", label:"Physical defects?", notesName:"Defect_Notes" })}
+          ${renderYesNoNotes({ name:"Doctor", label:"Under doctor/dentist care?", notesName:"Doctor_Notes" })}
+          ${renderYesNoNotes({ name:"Meds_Drugs", label:"Medications or drugs?", notesName:"Meds_Drugs_Notes" })}`
+      },
+      {
+        title: "Preliminary Exam",
+        html: `
+          <div class="grid grid-3">
+            ${renderInput({ name:"Attitude", label:"Attitude" })}
+            ${renderInput({ name:"Coordination", label:"Coordination" })}
+            ${renderInput({ name:"Speech", label:"Speech" })}
+            ${renderInput({ name:"Breath_Odor", label:"Breath odor" })}
+            ${renderInput({ name:"Face", label:"Face" })}
+            ${renderInput({ name:"Pulse1", label:"First pulse", type:"number" })}
+            ${renderInput({ name:"Pulse1_Time", label:"First pulse time", type:"time" })}
+          </div>
+          ${renderCorrectiveLenses()}
+          ${renderCheckboxGroup({ name:"Eyes", label:"Eyes", options:["Normal","Watery","Bloodshot"] })}
+          ${renderCheckboxGroup({ name:"Blind", label:"Blindness", options:["None","Left","Right"], exclusive:"None" })}
+          ${renderRadio({ name:"Tracking", label:"Tracking", options:["Equal","Unequal"] })}
+          ${renderPupilSize()}
+          <div class="grid grid-2">
+            ${renderYesNo({ name:"Resting_Nystagmus", label:"Resting nystagmus" })}
+            ${renderYesNo({ name:"Vertical_Nystagmus", label:"Vertical nystagmus" })}
+            ${renderYesNo({ name:"Able_To_Follow", label:"Able to follow stimulus" })}
+            ${renderRadio({ name:"Eyelids", label:"Eyelids", options:["Normal","Droopy"] })}
+          </div>
+          ${renderTextarea({ name:"Prelim_Notes", label:"Preliminary exam notes" })}`
+      },
+      {
+        title: "HGN / VGN / Convergence",
+        html: `
+          ${renderHGN()}
+          <div class="grid grid-2">
+            ${renderYesNo({ name:"Vertical_Nyst", label:"Vertical gaze nystagmus present?" })}
+            ${renderInput({ name:"LOC", label:"Lack of convergence" })}
+          </div>`
+      },
+      {
+        title: "Modified Romberg Balance",
+        html: renderMRB()
+      },
+      {
+        title: "Walk and Turn",
+        html: renderWAT()
+      },
+      {
+        title: "One Leg Stand",
+        html: renderOLS()
+      },
+      {
+        title: "Finger to Nose",
+        html: renderFTN()
+      },
+      {
+        title: "Vital Signs & Pupils",
+        html: renderVitals()
+      },
+      {
+        title: "Oral / Nasal / Muscle Tone",
+        html: renderOral()
+      },
+      {
+        title: "Drug Use Details",
+        html: renderDrugUse()
+      },
+      {
+        title: "Timeline",
+        html: renderTimeline()
+      },
+      {
+        title: "Evaluator Opinion",
+        html: renderOpinion()
+      }
+    ];
+
+    formEl.innerHTML = sections.map(sec => `<section class="sec"><h2>${sec.title}</h2><div class="body">${sec.html}</div></section>`).join("");
+  }
+
+  function showAge(){
+    const dob = formEl.querySelector('#Subject_DOB');
+    const evalDate = formEl.querySelector('#Eval_Date');
+    const ageInput = formEl.querySelector('#Subject_Age');
+    if(!dob || !ageInput) return;
+    const dobVal = dob.value;
+    if(!dobVal){ ageInput.value = ""; return; }
+    const birth = new Date(dobVal + 'T00:00:00');
+    const refVal = evalDate && evalDate.value ? evalDate.value : null;
+    const refDate = refVal ? new Date(refVal + 'T00:00:00') : new Date();
+    if(Number.isNaN(birth.getTime())){ ageInput.value = ""; return; }
+    if(Number.isNaN(refDate.getTime())){ ageInput.value = ""; return; }
+    let age = refDate.getFullYear() - birth.getFullYear();
+    const md = refDate.getMonth() - birth.getMonth();
+    if(md < 0 || (md === 0 && refDate.getDate() < birth.getDate())) age--;
+    ageInput.value = age >= 0 ? age : "";
+  }
+
+  function setupConditional(){
+    formEl.querySelectorAll('.yes-no-notes').forEach(group => {
+      const notes = group.querySelector('.notes');
+      const radios = group.querySelectorAll('input[type="radio"]');
+      const toggle = () => {
+        const checked = group.querySelector('input[type="radio"]:checked');
+        const show = checked && checked.value === 'Yes';
+        if(notes){
+          notes.classList.toggle('hidden', !show && !notes.value);
+          if(!show) notes.dataset.hidden = '1'; else delete notes.dataset.hidden;
+        }
+      };
+      radios.forEach(r => r.addEventListener('change', toggle));
+      toggle();
+    });
+
+    formEl.querySelectorAll('.yes-no').forEach(group => {
+      const radios = group.querySelectorAll('input[type="radio"]');
+      if(!radios.length) return;
+      const first = radios[0];
+      if(!group.dataset.initialized){
+        group.dataset.initialized = '1';
+      }
+    });
+
+    const mirandaNotes = formEl.querySelector('#Miranda_Given_By');
+    const mirandaGroup = formEl.querySelector('[data-field="Miranda"]');
+    if(mirandaNotes && mirandaGroup){
+      const updateMiranda = () => {
+        const checked = mirandaGroup.querySelector('input[type="radio"]:checked');
+        const show = checked && checked.value === 'Yes';
+        mirandaNotes.classList.toggle('hidden', !show && !mirandaNotes.value);
+      };
+      mirandaGroup.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener('change', updateMiranda));
+      updateMiranda();
+    }
+
+    const sleepField = formEl.querySelector('#Last_Slept');
+    const sleepAmount = formEl.querySelector('#Sleep_Amount');
+    if(sleepField && sleepAmount){
+      const update = () => {
+        const show = !!sleepField.value;
+        sleepAmount.parentElement.parentElement.classList.toggle('hidden', !show && !sleepAmount.value);
+      };
+      sleepField.addEventListener('input', update);
+      update();
+    }
+
+    const lensGroup = formEl.querySelector('.corrective-lenses');
+    if(lensGroup){
+      const noneBox = lensGroup.querySelector('input[name="Lenses_None"]');
+      const contactBox = lensGroup.querySelector('input[name="Contacts"]');
+      const contactType = lensGroup.querySelector('.contact-type');
+      const boxes = lensGroup.querySelectorAll('input[type="checkbox"]');
+      const update = () => {
+        if(noneBox && noneBox.checked){
+          boxes.forEach(box => { if(box !== noneBox) box.checked = false; });
+        }
+        if(contactType){
+          const show = contactBox && contactBox.checked;
+          contactType.classList.toggle('hidden', !show);
+          if(!show){
+            lensGroup.querySelectorAll('input[name="Lens_Type"]').forEach(r => r.checked = false);
+          }
+        }
+      };
+      boxes.forEach(box => box.addEventListener('change', update));
+      update();
+    }
+
+    formEl.querySelectorAll('.checkbox-list[data-exclusive]').forEach(container => {
+      const exclusive = container.dataset.exclusive;
+      const boxes = container.querySelectorAll('input[type="checkbox"]');
+      boxes.forEach(box => {
+        box.addEventListener('change', () => {
+          if(box.value === exclusive && box.checked){
+            boxes.forEach(other => { if(other !== box) other.checked = false; });
+          } else if(box.checked){
+            boxes.forEach(other => { if(other.value === exclusive) other.checked = false; });
+          }
+        });
+      });
+    });
+
+    const pupilGroup = formEl.querySelector('.pupil-size');
+    if(pupilGroup){
+      const notes = pupilGroup.querySelector('.notes');
+      const update = () => {
+        const checked = pupilGroup.querySelector('input[type="radio"]:checked');
+        const show = checked && checked.value === 'Unequal';
+        if(notes) notes.classList.toggle('hidden', !show && !notes.value);
+      };
+      pupilGroup.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener('change', update));
+      update();
+    }
+
+    formEl.querySelectorAll('.checkbox-list input[data-collect="list"]').forEach(box => {
+      box.addEventListener('change', () => {});
+    });
+
+    showAge();
+  }
+
   function dataFromForm(){
+    showAge();
     const data = {};
-    formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
-      .forEach(el => { if (el.name) data[el.name] = el.value; });
-
-    const m = formEl.querySelector('input[name="Miranda"]:checked');
-    if (m) data.Miranda = m.value;
-
-    ["Crash_None","Crash_Fatal","Crash_Injury","Crash_Property"].forEach(k=>{
-      const el = formEl.querySelector(`input[name="${k}"]`); if (el && el.checked) data[k] = true;
+    const listValues = {};
+    formEl.querySelectorAll('input,select,textarea').forEach(el => {
+      if(!el.name) return;
+      if(el.type === 'radio'){
+        if(el.checked) data[el.name] = el.value;
+      } else if(el.type === 'checkbox'){
+        if(el.dataset.collect === 'list'){
+          if(!listValues[el.name]) listValues[el.name] = [];
+          if(el.checked) listValues[el.name].push(el.value);
+        } else {
+          if(el.checked) data[el.name] = true;
+        }
+      } else {
+        if(el.value) data[el.name] = el.value;
+      }
     });
-    ["Chemical_Refused","Chemical_OralFluid","Chemical_Blood","Chemical_Urine"].forEach(k=>{
-      const el = formEl.querySelector(`input[name="${k}"]`); if (el && el.checked) data[k] = true;
+
+    Object.entries(listValues).forEach(([name, values]) => {
+      if(values.length) data[name] = values;
     });
+
+    const crashOptions = [
+      ["Crash_None", "None"],
+      ["Crash_Fatal", "Fatal"],
+      ["Crash_Injury", "Injury"],
+      ["Crash_Property", "Property"]
+    ];
+    const crash = crashOptions.find(([field]) => formEl.querySelector(`input[name="${field}"]`)?.checked);
+    if(crash) data.Crash = crash[1];
+
+    const chemical = [
+      ["Chem_Refused", "Refused"],
+      ["Chem_Oral", "Oral fluid"],
+      ["Chem_Blood", "Blood"],
+      ["Chem_Urine", "Urine"]
+    ];
+    const chemicalParts = [];
+    chemical.forEach(([field,label]) => {
+      if(formEl.querySelector(`input[name="${field}"]`)?.checked) chemicalParts.push(label);
+    });
+    if(chemicalParts.length) data.Chemical_Test = chemicalParts.join(', ');
+
+    const eyes = data.Eyes;
+    if(Array.isArray(eyes)) data.Eyes_Display = eyes.join(', ');
+    const blind = data.Blind;
+    if(Array.isArray(blind)) data.Blind_Display = blind.join(', ');
+
+    const lensSummary = [];
+    if(data.Lenses_None) lensSummary.push('None');
+    if(data.Glasses) lensSummary.push('Glasses');
+    if(data.Contacts){
+      const type = data.Lens_Type ? `Contacts (${data.Lens_Type})` : 'Contacts';
+      lensSummary.push(type);
+    }
+    if(lensSummary.length) data.Corrective_Lenses = lensSummary.join(', ');
+
+    if(data.Pulse1) data.Pulse1_Display = data.Pulse1 + (data.Pulse1_Time ? ` @ ${data.Pulse1_Time}` : '');
+    if(data.Pulse2 && data.Pulse2_Time) data.Pulse2_Display = `${data.Pulse2} @ ${data.Pulse2_Time}`;
+    if(data.Pulse3 && data.Pulse3_Time) data.Pulse3_Display = `${data.Pulse3} @ ${data.Pulse3_Time}`;
+
+    if(data.Systolic || data.Diastolic){
+      data.BP = `${data.Systolic || ''}${data.Systolic && data.Diastolic ? '/' : ''}${data.Diastolic || ''}`;
+    }
+
+    const pupil = (left, right) => {
+      const l = data[left];
+      const r = data[right];
+      if(!l && !r) return '';
+      return `${l || ''}${l && r ? ' / ' : ''}${r || ''}`.trim();
+    };
+    data.Pupil_Room = pupil('Room_Light_L','Room_Light_R');
+    data.Pupil_Dark = pupil('Darkness_L','Darkness_R');
+    data.Pupil_Direct = pupil('Direct_L','Direct_R');
+    if(data.Direct_L1 || data.Direct_R1){
+      data.Pupil_Direct_Range = pupil('Direct_L1','Direct_R1');
+    }
+
+    const drinkingSummary = [];
+    if(data.What_Drinking) drinkingSummary.push(`What: ${data.What_Drinking}`);
+    if(data.When_Drinking) drinkingSummary.push(`When: ${data.When_Drinking}`);
+    if(data.Last_Drink) drinkingSummary.push(`Last drink: ${data.Last_Drink}`);
+    if(drinkingSummary.length) data.Drinking = drinkingSummary.join(' | ');
+
     return data;
   }
 
-  async function postJSON(url, obj){
-    const res = await fetch(url,{method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(obj)});
-    if(!res.ok) throw new Error(await res.text());
-    return res;
+  function postJSON(url, obj){
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(obj)
+    });
   }
 
-  // ---------- Buttons ----------
-  document.getElementById("previewBtn").onclick = async ()=>{
+  document.getElementById('previewBtn').addEventListener('click', async () => {
     try{
-      const res = await postJSON("/narrative", dataFromForm());
+      const res = await postJSON('/narrative', dataFromForm());
+      if(!res.ok) throw new Error(await res.text());
       const { narrative } = await res.json();
-      document.getElementById("narrative").textContent = narrative || "(empty)";
-    }catch(e){ alert("Narrative error: "+e.message); }
-  };
-
-  document.getElementById("pdfBtn").onclick = async ()=>{
-    try{
-      const res = await postJSON("/pdf", dataFromForm());
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a"); a.href=url; a.download="dre-report.pdf"; a.click();
-      URL.revokeObjectURL(url);
-    }catch(e){ alert("PDF error: "+e.message); }
-  };
-
-  document.getElementById("saveJson").onclick = ()=>{
-    const blob = new Blob([JSON.stringify(dataFromForm(), null, 2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href=url; a.download="dre-report.json"; a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  document.getElementById("loadJson").addEventListener("change", (ev)=>{
-    const f = ev.target.files[0]; if(!f) return;
-    const r = new FileReader();
-    r.onload = () => {
-      try{
-        const data = JSON.parse(r.result);
-        formEl.querySelectorAll("input[type=text],input[type=date],input[type=time],input[type=number],textarea,select")
-          .forEach(el => { if (el.name && data[el.name] !== undefined) el.value = data[el.name]; });
-        const rb = formEl.querySelector(`input[name="Miranda"][value="${data.Miranda}"]`);
-        if (rb) rb.checked = true;
-        if (data.Miranda_Notes) document.getElementById("Miranda_Notes").value = data.Miranda_Notes;
-        ["Crash_None","Crash_Fatal","Crash_Injury","Crash_Property"].forEach(k=>{
-          const el = formEl.querySelector(`input[name="${k}"]`); if (el) el.checked = !!data[k];
-        });
-        ["Chemical_Refused","Chemical_OralFluid","Chemical_Blood","Chemical_Urine"].forEach(k=>{
-          const el = formEl.querySelector(`input[name="${k}"]`); if (el) el.checked = !!data[k];
-        });
-      }catch{ alert("Invalid JSON");}
-    };
-    r.readAsText(f);
+      document.getElementById('narrative').textContent = narrative || '(empty)';
+    }catch(err){
+      alert('Narrative error: ' + err.message);
+    }
   });
 
-  document.getElementById("clearBtn").onclick = ()=>{
-    formEl.querySelectorAll("input,textarea,select").forEach(el=>{
-      if (el.type === "checkbox" || el.type === "radio") el.checked = false;
-      else el.value = "";
-    });
-    document.getElementById("narrative").textContent = "";
-  };
+  document.getElementById('pdfBtn').addEventListener('click', async () => {
+    try{
+      const res = await postJSON('/pdf', dataFromForm());
+      if(!res.ok) throw new Error(await res.text());
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'dre-report.pdf'; a.click();
+      URL.revokeObjectURL(url);
+    }catch(err){
+      alert('PDF error: ' + err.message);
+    }
+  });
 
-  // init
-  build();
+  document.getElementById('saveJson').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(dataFromForm(), null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'dre-report.json'; a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('loadJson').addEventListener('change', event => {
+    const file = event.target.files?.[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const data = JSON.parse(reader.result);
+        formEl.querySelectorAll('input,textarea,select').forEach(el => {
+          if(!el.name) return;
+          const value = data[el.name];
+          if(el.type === 'radio'){
+            el.checked = value !== undefined && value === el.value;
+          } else if(el.type === 'checkbox'){
+            if(el.dataset.collect === 'list'){
+              const raw = data[el.name];
+              const values = Array.isArray(raw) ? raw.map(String) : typeof raw === 'string' ? raw.split(/[,|]/).map(s => s.trim()) : [];
+              el.checked = values.includes(el.value);
+            } else {
+              el.checked = !!value;
+            }
+          } else if(value !== undefined){
+            el.value = value;
+          } else {
+            el.value = '';
+          }
+        });
+        setupConditional();
+      }catch(err){
+        alert('Invalid JSON');
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    formEl.querySelectorAll('input,textarea,select').forEach(el => {
+      if(el.type === 'checkbox' || el.type === 'radio') el.checked = false; else el.value = '';
+    });
+    document.getElementById('narrative').textContent = '';
+    setupConditional();
+  });
+
+  buildForm();
+  setupConditional();
+  formEl.addEventListener('input', event => {
+    if(event.target.matches('#Subject_DOB, #Eval_Date')) showAge();
+  });
 </script>
 </body>
 </html>
